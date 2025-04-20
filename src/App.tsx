@@ -1,9 +1,8 @@
 import './App.css';
 import './fade-transition.css';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import logo from './assets/Actum_Official_Logo.jpg';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import Home from './pages/Home';
 import Mission from './pages/Mission';
 import Team from './pages/Team';
@@ -25,18 +24,16 @@ const sidebarLinks = [
 ];
 
 const socialLinks = [
-  { label: 'YouTube', href: 'https://youtube.com', icon: <FaYoutube /> },
-  { label: 'Instagram', href: 'https://instagram.com', icon: <FaInstagram /> },
-  { label: 'Facebook', href: 'https://facebook.com', icon: <FaFacebook /> },
-  { label: 'TikTok', href: 'https://tiktok.com', icon: <FaTiktok /> },
-  { label: 'X', href: 'https://x.com', icon: <FaXTwitter /> },
+  { label: 'YouTube', href: 'https://www.youtube.com/@becauseitsfair', icon: <FaYoutube /> },
+  { label: 'Instagram', href: 'https://www.instagram.com/becauseitsfair/', icon: <FaInstagram /> },
+  { label: 'Facebook', href: 'https://www.facebook.com/becauseitsfair/', icon: <FaFacebook /> },
+  { label: 'TikTok', href: 'https://www.tiktok.com/@becauseitsfair', icon: <FaTiktok /> },
+  { label: 'X', href: 'https://x.com/becauseitsfair', icon: <FaXTwitter /> },
 ];
 
 function AnimatedRoutes() {
-  const location = useLocation();
-  const nodeRef = useRef(null);
-  const element = (
-    <Routes location={location}>
+  return (
+    <Routes>
       <Route path="/mission" element={<Mission />} />
       <Route path="/" element={<Home />} />
       <Route path="/team" element={<main className="main-content"><Team /></main>} />
@@ -46,23 +43,6 @@ function AnimatedRoutes() {
       <Route path="/laboratory" element={<main className="main-content"><Laboratory /></main>} />
       <Route path="/shop" element={<main className="main-content"><Shop /></main>} />
     </Routes>
-  );
-
-  return (
-    <TransitionGroup component={null}>
-      <CSSTransition
-        key={location.pathname}
-        classNames="fade"
-        timeout={350}
-        nodeRef={nodeRef}
-        unmountOnExit
-        appear
-      >
-        <div ref={nodeRef}>
-          {element}
-        </div>
-      </CSSTransition>
-    </TransitionGroup>
   );
 }
 
@@ -83,7 +63,7 @@ function AppLayout() {
           <div className="logo-block">
             <Link to="/" className="logo-link" tabIndex={-1} style={{display:'flex', flexDirection:'column', alignItems:'center', textDecoration:'none'}}>
               <img src={logo} alt="ACTUM Logo" className="logo-img-official" />
-              <div className="logo-title-official">ACTUM</div>
+              {/* <div className="logo-title-official">ACTUM</div> */}
             </Link>
           </div>
           <nav className="sidebar-nav">

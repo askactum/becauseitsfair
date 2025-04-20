@@ -1,6 +1,6 @@
 export default function Contact() {
   return (
-    <div className="page-content contact-page" style={{ maxWidth: 1200, margin: '0 auto', padding: '2.5rem 1rem', fontFamily: 'Georgia, serif', color: '#222', display: 'flex', flexWrap: 'wrap', gap: '2.5rem', alignItems: 'flex-start', justifyContent: 'center' }}>
+    <div className="page-content contact-page" style={{ maxWidth: 1200, margin: '0 auto', padding: '2.5rem 1rem', fontFamily: 'Georgia, serif', color: '#222', display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '2.5rem', alignItems: 'flex-start', justifyContent: 'center' }}>
       <div style={{ flex: '2 1 380px', minWidth: 290, maxWidth: 520 }}>
         <h1 style={{ fontWeight: 400, fontSize: '2.6rem', margin: '0 0 1.7rem 0', letterSpacing: '0.01em' }}>Let’s connect.</h1>
         <p style={{ fontSize: '1.19rem', marginBottom: '1.5rem', color: '#444' }}>

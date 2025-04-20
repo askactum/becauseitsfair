@@ -40,7 +40,6 @@ html, body {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  overflow: hidden;
 }
 
 .main-content {
@@ -130,7 +129,7 @@ html, body {
   justify-content: center;
 }
 .sidebar-link.main-link {
-  color: #132d5c;
+  color: #000000;
   font-family: 'Georgia', serif;
   font-size: 1.4rem;
   text-transform: lowercase;
@@ -180,7 +179,7 @@ html, body {
   object-fit: cover;
   object-position: center;
   border-radius: 12px;
-  transform: scale(1.18);
+  transform: scale(2);
   background: #fff;
   border: none;
   display: block;
