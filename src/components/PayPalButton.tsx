@@ -1,3 +1,10 @@
+// Add a type declaration for window.paypal
+declare global {
+  interface Window {
+    paypal?: any;
+  }
+}
+
 import { useEffect, useRef } from 'react';
 
 interface PayPalButtonProps {
@@ -20,12 +27,12 @@ export default function PayPalButton({ amount, onSuccess, onError, disabled }: P
         label: 'donate',
         height: 45,
       },
-      createOrder: (data: any, actions: any) => {
+      createOrder: (_: any, actions: any) => {
         return actions.order.create({
           purchase_units: [{ amount: { value: amount } }],
         });
       },
-      onApprove: async (data: any, actions: any) => {
+      onApprove: async (_: any, actions: any) => {
         const details = await actions.order.capture();
         onSuccess(details);
       },

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import PayPalButton from '../components/PayPalButton';
 
 const PRESET_AMOUNTS = [10, 20, 50, 100];
 
@@ -7,8 +6,8 @@ export default function Donate() {
   const [amount, setAmount] = useState('10.00');
   const [custom, setCustom] = useState('');
   const [type, setType] = useState('One-Time Donation');
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
+  const [success] = useState(false);
+  const [error] = useState('');
 
   const handleAmount = (amt: string) => {
     setAmount(amt);
@@ -101,15 +100,6 @@ export default function Donate() {
           <span>Total</span>
           <span>${amount || '0.00'}</span>
         </div>
-        {/* Uncomment below to enable PayPal live integration */}
-        {/*
-        <PayPalButton
-          amount={amount || '0.00'}
-          onSuccess={details => setSuccess(true)}
-          onError={err => setError('Payment failed. Please try again.')}
-          disabled={parseFloat(amount) < 1}
-        />
-        */}
         <button style={{
           width: '100%',
           padding: '0.9rem 0',
