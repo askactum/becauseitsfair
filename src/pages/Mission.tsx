@@ -1,0 +1,27 @@
+import './Mission.css';
+
+export default function Mission() {
+  return (
+    <div className="main-content">
+      <h1 className="mission-title">About Us</h1>
+      <p className="mission-description">
+        The mission of Actum is to create <strong>free, universal housing for all.</strong> We believe that having a secure home is a right. Unlike corporations and governments that commodify housing and profit from human need, we stand firm in our conviction that shelter should never be treated as a transaction, but as an inalienable right for all. While the challenge is great, there simply is no other option but to recognize a home as a birthright. This is about building housing <strong>not at a low cost, but at no cost—and</strong> leading the way to ensure that every person can live to their fullest, and experience the dignity they have always deserved.
+      </p>
+      <div className="mission-latin">
+        <span className="latin-title">Actum is latin for</span>
+        <span className="latin-meaning">“an action / something that has been done.”</span>
+      </div>
+      <h1 className="mission-section-title">Prove it.</h1>
+      <div className="mission-objections">
+        <p><strong>“It's impossible. You can't just give people free homes.”</strong> If we purchase a housing property, and invite others to live inside at no cost, then we already have. It will take time to scale, but time is a wonderful price to pay for something as foundational as a roof for all.</p>
+        <p><strong>“Life is all about effort and things cost money.  This is part of society.”</strong> Just because something is accepted does not make it ethical. Public education, for example, was not always a given. In fact, it faced significant resistance. Before the 19th century, it was reserved as a privilege and regarded as too expensive. But through a social shift, we began to recognize the need for education and now, school is made for all. What was unwanted and impossible is now a global and ethical standard.</p>
+        <p><strong>“This costs lots of money to make happen, therefore not truly free.”</strong> The cost of resources and home-building will surprise you when profit is not an interest. Those a part of our mission know that we must prioritize long-term benefits over short-term costs. This is not a social cause, but a defining moment in our history. Donations make Actum’s mission possible. The first Actum home is more than just a home, but a powerful, global awareness that housing is a birthright.</p>
+        <p><strong>“Social housing and shelters already exist.”</strong> Universal housing is about guaranteeing a home for everyone, regardless of income, location, or circumstance. The similar models that exist offer affordable housing, which doesn’t directly tackle the core violation in the world: every person born deserves a roof.</p>
+        <p><strong>“Giving people a free place to live will make them lazy.”</strong> We hope so. Unfortunately, too many people are rooted in the idea we should “work hard” to deserve basic needs. This is simply false. A basic need does not need to be earned. Fear that others will turn “lazy” overlooks the larger issue— that everyone deserves basic security regardless of productivity. Also, one may consider that stability allows people to pursue education, personal development, passions, and the opportunity to raise a family without the constant stress of housing insecurity.</p>
+        <p><strong>“Other priorities like hunger, healthcare, or education are more urgent.”</strong> A home is foundational. One’s healthcare deteriorates due to stress and unsafe living conditions. Education suffers when children lack a stable home environment to study. Hunger persists because of financial struggle and lack of cooking facilities. By addressing housing first, we create a foundation for the world. Actum believes it’s the first step humanity ever deserved, and if it’s today we must solve it, then today it will be.</p>
+        <p><strong>“This would disrupt the economy.”</strong> Universal housing stabilizes communities and promotes economic growth. We don’t eliminate private ownership, but allow individuals to spend money in other areas. Far from destabilization, it fosters a productive and thriving society.</p>
+        <p><strong>“This is not sustainable.”</strong> This is an investment in the well-being of the world. As long as we live, we can sustain. To dismiss this issue would be a moral failure. Our team is not governed by greed or personal gain. We are governed by the unshakable, fundamental truth. This is not an organization made from ambition, but from responsibility.</p>
+      </div>
+    </div>
+  );
+}
