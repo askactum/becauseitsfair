@@ -28,12 +28,12 @@ export default function Donate() {
       fontFamily: 'Georgia, serif',
       color: '#222',
       display: 'flex',
-      flexWrap: 'wrap',
+      flexDirection: 'column',
       gap: '2.5rem',
       alignItems: 'center',
       justifyContent: 'center',
     }}>
-      <div style={{ flex: '1 1 340px', minWidth: 290, maxWidth: 400, marginRight: '1.5rem' }}>
+      <div style={{ width: '100%', maxWidth: 400, marginBottom: '2.2rem' }}>
         <h1 style={{ textAlign: 'left', fontWeight: 400, fontSize: '2.2rem', margin: '0 0 1.2rem 0', letterSpacing: '0.01em' }}>Give a high five.</h1>
         <p style={{ textAlign: 'left', margin: '0 0 1.1rem 0', fontSize: '1.13rem' }}>
           Start by giving $5 and take the first steps to ensure housing for all.
@@ -48,7 +48,7 @@ export default function Donate() {
           Track how every penny of our funds are spent in our progress page.
         </div>
       </div>
-      <div style={{ flex: '1 1 340px', minWidth: 290, maxWidth: 370, background: '#f7f6f3', borderRadius: 22, padding: '2.2rem 1.5rem 2rem 1.5rem', boxShadow: '0 2px 14px rgba(0,0,0,0.07)' }}>
+      <div style={{ width: '100%', maxWidth: 370, background: '#f7f6f3', borderRadius: 22, padding: '2.2rem 1.5rem 2rem 1.5rem', boxShadow: '0 2px 14px rgba(0,0,0,0.07)' }}>
         <div style={{ display: 'flex', gap: 10, marginBottom: 18, flexWrap: 'wrap', justifyContent: 'center' }}>
           {PRESET_AMOUNTS.map(amt => (
             <button key={amt} onClick={() => handleAmount(amt.toFixed(2))} style={{

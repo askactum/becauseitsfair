@@ -35,13 +35,6 @@ html, body {
   box-sizing: border-box;
 }
 
-.content-area > div {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
 .main-content {
   flex-grow: 1;
   min-height: 0;
@@ -301,7 +294,7 @@ html, body {
 
 /* --- RESPONSIVE STYLES --- */
 @media (min-width: 900px) {
-  .hamburger, .sidebar-overlay {
+  .sidebar-overlay {
     display: none !important;
   }
   .main-content {
@@ -470,19 +463,7 @@ html, body {
     padding: 1.5rem 1.2rem 1.5rem 1.2rem;
   }
   .hamburger {
-    display: flex !important;
-    position: fixed;
-    left: 1.1rem;
-    top: 1.1rem;
-    z-index: 10;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    width: 44px;
-    height: 44px;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
+    display: none !important;
   }
 }
 
@@ -1095,5 +1076,19 @@ team-member-photo {
   .mission-objections p {
     font-size: 1rem;
     max-width: 98vw;
+  }
+}
+
+/* Override top nav bar and its text colors on mobile view */
+@media (max-width: 899px) {
+  .top-nav.mobile-dropdown-nav {
+    background: #fff !important;
+    color: #111 !important;
+  }
+  .top-nav.mobile-dropdown-nav span {
+    color: #111 !important;
+  }
+  .top-nav.mobile-dropdown-nav .dropdown-toggle {
+    color: #111 !important;
   }
 }

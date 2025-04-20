@@ -1,6 +1,6 @@
 import './App.css';
 import './fade-transition.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import logo from './assets/Actum_Official_Logo.jpg';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
@@ -47,52 +47,92 @@ function AnimatedRoutes() {
 }
 
 function AppLayout() {
-  const [showSidebar, setShowSidebar] = useState(false);
-  const toggleSidebar = () => setShowSidebar(!showSidebar);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const location = useLocation();
+
+  // Responsive detection for mobile and smaller screens
+  useEffect(() => {
+    function handleResize() {
+      setIsMobile(window.innerWidth <= 1024); // 1024px covers tablets and smaller
+    }
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <div className="main-layout fit-one-page">
-      <button className="hamburger top-right" onClick={toggleSidebar} aria-label="Toggle navigation menu">
-        <span className="bar"></span>
-        <span className="bar"></span>
-        <span className="bar"></span>
-      </button>
-      {showSidebar && <div className="sidebar-overlay" onClick={toggleSidebar}></div>}
-      <div className="sidebar-container">
-        <aside className={`sidebar always-visible${showSidebar ? ' open-mobile' : ''}`}> 
-          <div className="logo-block">
-            <Link to="/" className="logo-link" tabIndex={-1} style={{display:'flex', flexDirection:'column', alignItems:'center', textDecoration:'none'}}>
-              <img src={logo} alt="ACTUM Logo" className="logo-img-official" />
-              {/* <div className="logo-title-official">ACTUM</div> */}
+      {/* Top nav for mobile/tablet/small screens */}
+      {isMobile && (
+        <header className="top-nav mobile-dropdown-nav" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', zIndex: 1000, background: '#fff', boxShadow: '0 2px 16px rgba(0,0,0,0.07)' }}>
+          <div style={{display: 'flex', alignItems: 'center', width: '100%'}}>
+            <Link to="/" tabIndex={-1} style={{display: 'flex', alignItems: 'center', marginLeft: '0.6rem', marginRight: '0.6rem'}}>
+              <img src={logo} alt="ACTUM Logo" style={{width: 38, height: 38, borderRadius: 8, marginRight: '0.7rem'}} />
             </Link>
+            <button
+              className="dropdown-toggle"
+              aria-label="Toggle navigation menu"
+              onClick={() => setShowDropdown((s) => !s)}
+              style={{padding: '1rem', fontSize: '1.1rem', background: 'none', border: 'none', textAlign: 'left', flex: 1}}>
+              Menu &#9662;
+            </button>
+            <span style={{fontWeight: 700, fontSize: '1.1rem', paddingRight: '1.2rem', color: '#222', fontFamily: 'Georgia, serif'}}>because it's fair</span>
           </div>
-          <nav className="sidebar-nav">
-            {sidebarLinks.map((link) => {
-              const isActive = location.pathname === link.href;
-              return (
-                <div key={link.label} className="sidebar-link-block">
-                  <Link
-                    to={link.href}
-                    className={`sidebar-link main-link${isActive ? ' active' : ''}`}
-                    onClick={() => setShowSidebar(false)}
-                  >
-                    {link.label}
-                    {isActive && <div className="underline" />}
-                  </Link>
-                </div>
-              );
-            })}
-          </nav>
-          <div className="sidebar-socials bottom">
-            {socialLinks.map(link => (
-              <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" title={link.label} className="icon">
-                {link.icon}
-              </a>
-            ))}
-          </div>
-        </aside>
-      </div>
-      <div className="content-area with-sidebar">
+          {showDropdown && (
+            <nav className="dropdown-menu" style={{width: '100%', background: '#fff', border: '1px solid #eee', borderTop: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.07)'}}>
+              {sidebarLinks.map((link) => (
+                <Link
+                  key={link.label}
+                  to={link.href}
+                  className={`dropdown-link${location.pathname === link.href ? ' active' : ''}`}
+                  style={{display: 'block', padding: '1rem 1.5rem', color: '#222', textDecoration: 'none', fontFamily: 'Georgia, serif', fontSize: '1.1rem'}}
+                  onClick={() => setShowDropdown(false)}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          )}
+        </header>
+      )}
+      {/* Sidebar for larger screens */}
+      {!isMobile && (
+        <div className="sidebar-container">
+          <aside className="sidebar always-visible">
+            <div className="logo-block">
+              <Link to="/" className="logo-link" tabIndex={-1} style={{display:'flex', flexDirection:'column', alignItems:'center', textDecoration:'none'}}>
+                <img src={logo} alt="ACTUM Logo" className="logo-img-official" />
+                {/* <div className="logo-title-official">ACTUM</div> */}
+              </Link>
+            </div>
+            <nav className="sidebar-nav">
+              {sidebarLinks.map((link) => {
+                const isActive = location.pathname === link.href;
+                return (
+                  <div key={link.label} className="sidebar-link-block">
+                    <Link
+                      to={link.href}
+                      className={`sidebar-link main-link${isActive ? ' active' : ''}`}
+                    >
+                      {link.label}
+                      {isActive && <div className="underline" />}
+                    </Link>
+                  </div>
+                );
+              })}
+            </nav>
+            <div className="sidebar-socials bottom">
+              {socialLinks.map(link => (
+                <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" title={link.label} className="icon">
+                  {link.icon}
+                </a>
+              ))}
+            </div>
+          </aside>
+        </div>
+      )}
+      <div className="content-area with-sidebar" style={{ marginTop: isMobile ? 60 : 0 }}>
         <header className="top-nav always-centered">
           <div className="nav-buttons">
             <Link to="/shop"><button>shop</button></Link>
