@@ -14,6 +14,7 @@ import Shop from './pages/Shop';
 import Progress from './pages/Progress';
 import Applications from './pages/Applications';
 import { FaYoutube, FaInstagram, FaFacebook, FaTiktok, FaXTwitter, FaTwitch } from 'react-icons/fa6';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const sidebarLinks = [
   { label: 'mission', href: '/mission' },
@@ -37,19 +38,40 @@ const socialLinks = [
 ];
 
 function AnimatedRoutes() {
+  const location = useLocation();
+
   return (
-    <Routes>
-      <Route path="/mission" element={<Mission />} />
-      <Route path="/" element={<Home />} />
-      <Route path="/team" element={<main className="main-content"><Team /></main>} />
-      <Route path="/plan" element={<main className="main-content"><Plan /></main>} />
-      <Route path="/progress" element={<main className="main-content"><Progress /></main>} />
-      <Route path="/donate" element={<main className="main-content"><Donate /></main>} />
-      <Route path="/contact" element={<main className="main-content"><Contact /></main>} />
-      <Route path="/laboratory" element={<main className="main-content"><Laboratory /></main>} />
-      <Route path="/shop" element={<main className="main-content"><Shop /></main>} />
-      <Route path="/applications" element={<main className="main-content"><Applications /></main>} />
-    </Routes>
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.key}>
+        {[
+          { path: '/', element: <Home /> },
+          { path: '/mission', element: <Mission /> },
+          { path: '/team', element: <Team /> },
+          { path: '/plan', element: <Plan /> },
+          { path: '/progress', element: <Progress /> },
+          { path: '/donate', element: <Donate /> },
+          { path: '/contact', element: <Contact /> },
+          { path: '/laboratory', element: <Laboratory /> },
+          { path: '/shop', element: <Shop /> },
+          { path: '/applications', element: <Applications /> },
+        ].map(({ path, element }) => (
+          <Route
+            key={path}
+            path={path}
+            element={
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4 }}
+              >
+                {element}
+              </motion.div>
+            }
+          />
+        ))}
+      </Routes>
+    </AnimatePresence>
   );
 }
 
