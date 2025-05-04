@@ -54,6 +54,19 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+@keyframes zoomInOut {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.zoom-animation {
+  animation: zoomInOut 2s infinite ease-in-out;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

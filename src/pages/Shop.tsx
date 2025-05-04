@@ -9,7 +9,7 @@ export default function Shop() {
         <circle cx="16" cy="17" r="1.5" fill="#fff"/>
       </svg>
       <h1 style={{ fontWeight: 500, fontSize: '2.2rem', margin: 0, color: '#222', letterSpacing: '0.01em' }}>Shop</h1>
-      <p style={{ fontSize: '1.25rem', color: '#444', marginTop: 14, fontStyle: 'italic' }}>Coming soon</p>
+      <p className="zoom-animation" style={{ fontSize: '1.25rem', color: '#444', marginTop: 14, fontStyle: 'italic' }}>Coming soon</p>
     </div>
   );
 }
