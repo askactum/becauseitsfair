@@ -11,12 +11,16 @@ import Donate from './pages/Donate';
 import Contact from './pages/Contact';
 import Laboratory from './pages/Laboratory';
 import Shop from './pages/Shop';
-import { FaYoutube, FaInstagram, FaFacebook, FaTiktok, FaXTwitter } from 'react-icons/fa6';
+import Progress from './pages/Progress';
+import Applications from './pages/Applications';
+import { FaYoutube, FaInstagram, FaFacebook, FaTiktok, FaXTwitter, FaTwitch } from 'react-icons/fa6';
 
 const sidebarLinks = [
   { label: 'mission', href: '/mission' },
   { label: 'team', href: '/team' },
   { label: 'our plan', href: '/plan' },
+  { label: 'track our progress', href: '/progress' },
+  { label: 'application for housing', href: '/applications' },
   { label: 'donate', href: '/donate' },
   { label: 'contact', href: '/contact' },
   { label: 'the laboratory', href: '/laboratory' },
@@ -29,6 +33,7 @@ const socialLinks = [
   { label: 'Facebook', href: 'https://www.facebook.com/becauseitsfair/', icon: <FaFacebook /> },
   { label: 'TikTok', href: 'https://www.tiktok.com/@becauseitsfair', icon: <FaTiktok /> },
   { label: 'X', href: 'https://x.com/becauseitsfair', icon: <FaXTwitter /> },
+  { label: 'Twitch', href: 'https://www.twitch.tv/universalhousing', icon: <FaTwitch /> },
 ];
 
 function AnimatedRoutes() {
@@ -38,10 +43,12 @@ function AnimatedRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/team" element={<main className="main-content"><Team /></main>} />
       <Route path="/plan" element={<main className="main-content"><Plan /></main>} />
+      <Route path="/progress" element={<main className="main-content"><Progress /></main>} />
       <Route path="/donate" element={<main className="main-content"><Donate /></main>} />
       <Route path="/contact" element={<main className="main-content"><Contact /></main>} />
       <Route path="/laboratory" element={<main className="main-content"><Laboratory /></main>} />
       <Route path="/shop" element={<main className="main-content"><Shop /></main>} />
+      <Route path="/applications" element={<main className="main-content"><Applications /></main>} />
     </Routes>
   );
 }
@@ -66,18 +73,42 @@ function AppLayout() {
       {/* Top nav for mobile/tablet/small screens */}
       {isMobile && (
         <header className="top-nav mobile-dropdown-nav" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', zIndex: 1000, background: '#fff', boxShadow: '0 2px 16px rgba(0,0,0,0.07)' }}>
-          <div style={{display: 'flex', alignItems: 'center', width: '100%'}}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            width: '100%',
+            position: 'relative',
+            minHeight: 60
+          }}>
             <Link to="/" tabIndex={-1} style={{display: 'flex', alignItems: 'center', marginLeft: '0.6rem', marginRight: '0.6rem'}}>
               <img src={logo} alt="ACTUM Logo" style={{width: 38, height: 38, borderRadius: 8, marginRight: '0.7rem'}} />
             </Link>
+            <span style={{
+              position: 'absolute',
+              left: 0, right: 0,
+              textAlign: 'center',
+              fontWeight: 700,
+              fontSize: '1.1rem',
+              color: '#222',
+              fontFamily: 'Georgia, serif',
+              pointerEvents: 'none'
+            }}>
+              because it's fair
+            </span>
             <button
               className="dropdown-toggle"
               aria-label="Toggle navigation menu"
               onClick={() => setShowDropdown((s) => !s)}
-              style={{padding: '1rem', fontSize: '1.1rem', background: 'none', border: 'none', textAlign: 'left', flex: 1}}>
+              style={{
+                padding: '1rem',
+                fontSize: '1.1rem',
+                background: 'none',
+                border: 'none',
+                textAlign: 'right',
+                marginLeft: 'auto'
+              }}>
               Menu &#9662;
             </button>
-            <span style={{fontWeight: 700, fontSize: '1.1rem', paddingRight: '1.2rem', color: '#222', fontFamily: 'Georgia, serif'}}>because it's fair</span>
           </div>
           {showDropdown && (
             <nav className="dropdown-menu" style={{width: '100%', background: '#fff', border: '1px solid #eee', borderTop: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.07)'}}>

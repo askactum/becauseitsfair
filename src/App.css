@@ -78,17 +78,20 @@ html, body {
 
 /* --- SIDEBAR SOCIALS --- */
 .sidebar-socials.bottom {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 38px);
+  grid-template-rows: repeat(2, 1fr);
+  column-gap: 2.05rem;
+  row-gap: 0.30rem;
+  width: auto;
+  margin: 0 auto;
   margin-top: auto;
-  gap: 0.5rem;
   padding-left: 0;
   padding-right: 0;
   padding-bottom: 1.2rem;
   background: none;
+  justify-items: center;
+  align-items: center;
 }
 .sidebar-socials.bottom .icon {
   background: #222;
@@ -165,6 +168,8 @@ html, body {
   margin-bottom: 2rem;
   padding-top: 1.5rem;
   width: 100%;
+  border-bottom: none; /* Remove the line under the ACTUM logo */
+  padding-bottom: 0; /* Reset padding */
 }
 .logo-img-official {
   width: 90px;
@@ -262,13 +267,13 @@ html, body {
 .mission-objections {
   max-width: 750px;
   margin: 0 auto 2.5rem auto;
-  font-size: 1.13rem;
+  font-size: 1.35rem;
   color: #222;
   font-family: 'Georgia', serif;
 }
 .mission-objections p {
   margin-bottom: 1.7rem;
-  font-size: 1.13rem;
+  font-size: 1.35rem;
   line-height: 1.7;
 }
 @media (max-width: 900px) {
@@ -287,7 +292,7 @@ html, body {
     font-size: 2rem;
   }
   .mission-objections p {
-    font-size: 1rem;
+    font-size: 1.35rem;
     max-width: 98vw;
   }
 }
@@ -835,8 +840,8 @@ html, body {
 .bio-modal-inner {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
-  gap: 2rem;
+  align-items: center;
+  gap: 2.5rem;
   min-width: 0;
   height: auto;
 }
@@ -851,7 +856,7 @@ html, body {
   border-radius: 12px;
   flex-shrink: 0;
   box-shadow: 0 2px 16px rgba(0,0,0,0.13);
-  align-self: flex-start;
+  align-self: center;
   display: block;
 }
 .bio-modal-right {
@@ -860,29 +865,24 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: flex-start;
-  height: auto;
+  justify-content: center;
+  height: 100%;
+  padding: 1rem 0;
 }
 .bio-modal-name {
   font-family: 'Georgia', serif;
   font-size: 1.45rem;
   font-weight: 700;
   color: #1a2233;
+  margin-bottom: 0.5rem;
 }
 .bio-modal-title-job {
   font-family: 'Georgia', serif;
   font-size: 1.08rem;
   font-weight: 700;
   color: #2d4c8d;
-  margin-bottom: 1.1rem;
+  margin-bottom: 1.5rem;
   letter-spacing: 0.01em;
-}
-.bio-modal-title {
-  font-family: 'Georgia', serif;
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 1.3rem;
-  text-align: left;
 }
 .bio-modal-content {
   font-size: 1.07rem;
@@ -904,18 +904,22 @@ html, body {
   .bio-modal-inner {
     flex-direction: column;
     align-items: center;
-    gap: 1.2rem;
+    gap: 1.5rem;
     height: auto;
   }
   .bio-modal-photo {
-    width: 110px;
+    width: 220px;
     max-width: 90vw;
-    height: 140px;
+    height: 280px;
     align-self: center;
   }
-  .bio-modal-title, .bio-modal-content {
-    text-align: center;
+  .bio-modal-right {
     align-items: center;
+    text-align: center;
+    padding: 0;
+  }
+  .bio-modal-content {
+    text-align: center;
   }
 }
 @media (max-width: 1200px) {
@@ -930,13 +934,32 @@ html, body {
 }
 @media (max-width: 800px) {
   .team-members-row {
+    display: flex;
     flex-direction: column;
     align-items: center;
     gap: 2rem;
-  }
-  .team-member-card {
-    width: 95vw;
+    width: 100%;
     max-width: 340px;
+    margin: 42rem auto 2.5rem auto;
+    flex-wrap: nowrap;
+  }
+  
+  .team-member-card {
+    width: 100%;
+    max-width: 340px;
+    margin-bottom: 0;
+    overflow: visible;
+    min-width: 280px;
+  }
+
+  .team-member-photo {
+    width: 100%;
+    height: 300px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-bottom: 1px solid #eee;
+    object-fit: cover;
   }
 }
 
@@ -999,10 +1022,11 @@ team-member-photo {
 }
 
 .donate-page {
-  min-height: 70vh;
+  min-height: unset; /* Remove the min-height to resolve the issue */
   display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+  align-items: flex-start; /* Align content to the top */
+  justify-content: flex-start; /* Prevent vertical centering */
+  padding-top: 4rem; /* Ensure the content starts below the navigation bar */
 }
 
 /* Mission page integration */
@@ -1016,7 +1040,7 @@ team-member-photo {
   font-family: 'Georgia', serif;
 }
 .mission-description {
-  font-size: 1.14rem;
+  font-size: 1.35rem;
   max-width: 700px;
   margin-bottom: 2.5rem;
   text-align: center;
@@ -1049,13 +1073,13 @@ team-member-photo {
 .mission-objections {
   max-width: 750px;
   margin: 0 auto 2.5rem auto;
-  font-size: 1.13rem;
+  font-size: 1.35rem;
   color: #222;
   font-family: 'Georgia', serif;
 }
 .mission-objections p {
   margin-bottom: 1.7rem;
-  font-size: 1.13rem;
+  font-size: 1.35rem;
   line-height: 1.7;
 }
 @media (max-width: 900px) {
@@ -1074,7 +1098,7 @@ team-member-photo {
     font-size: 2rem;
   }
   .mission-objections p {
-    font-size: 1rem;
+    font-size: 1.35rem;
     max-width: 98vw;
   }
 }
@@ -1090,5 +1114,60 @@ team-member-photo {
   }
   .top-nav.mobile-dropdown-nav .dropdown-toggle {
     color: #111 !important;
+  }
+}
+
+/* Donate Page Styles */
+.donate-page {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align content to the top */
+  justify-content: flex-start; /* Prevent vertical centering */
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+
+.donate-page .text-content {
+  flex: 1;
+  max-width: 400px;
+  margin-bottom: 2.2rem;
+}
+
+.donate-page .donation-box {
+  flex: 1;
+  max-width: 370px;
+  background: #f7f6f3;
+  border-radius: 22px;
+  padding: 2.2rem 1.5rem 2rem 1.5rem;
+  box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+}
+
+@media (max-width: 768px) {
+  .donate-page {
+    padding: 1rem 0.5rem;
+    min-height: auto;
+  }
+
+  .donate-page .text-content {
+    max-width: 100%;
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+
+  .donate-page .donation-box {
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+@media (max-width: 900px) {
+  .page-content, .donate-page {
+    padding-top: 40px;
+  }
+
+  .donate-page {
+    align-items: flex-start;
   }
 }

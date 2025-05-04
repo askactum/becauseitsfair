@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import './Donate.css';
 
-const PRESET_AMOUNTS = [10, 20, 50, 100];
+const PRESET_AMOUNTS = [5, 20, 50, 100];
 
 export default function Donate() {
   const [amount, setAmount] = useState('10.00');
@@ -27,28 +28,23 @@ export default function Donate() {
       padding: '2rem 1rem',
       fontFamily: 'Georgia, serif',
       color: '#222',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '2.5rem',
-      alignItems: 'center',
-      justifyContent: 'center',
     }}>
-      <div style={{ width: '100%', maxWidth: 400, marginBottom: '2.2rem' }}>
+      <div className="text-content">
         <h1 style={{ textAlign: 'left', fontWeight: 400, fontSize: '2.2rem', margin: '0 0 1.2rem 0', letterSpacing: '0.01em' }}>Give a high five.</h1>
-        <p style={{ textAlign: 'left', margin: '0 0 1.1rem 0', fontSize: '1.13rem' }}>
+        <p style={{ textAlign: 'left', margin: '0 0 1.1rem 0', fontSize: '1.35rem' }}>
           Start by giving $5 and take the first steps to ensure housing for all.
         </p>
-        <p style={{ textAlign: 'left', margin: '0 0 2.2rem 0', fontSize: '1.08rem', color: '#444' }}>
+        <p style={{ textAlign: 'left', margin: '0 0 2.2rem 0', fontSize: '1.35rem', color: '#444' }}>
           As of April 8, 2025, donations are not available at this time.
         </p>
-        <div style={{ fontStyle: 'italic', fontSize: '1.04rem', color: '#444', margin: '0 0 0.7rem 0', textAlign: 'left' }}>
+        <div style={{ fontStyle: 'italic', fontSize: '1.35rem', color: '#444', margin: '0 0 0.7rem 0', textAlign: 'left' }}>
           We are a non-profit organization.<br />pending 501(c)(3) status. Your donation is <b>tax deductible.</b><br />100% of proceeds support the mission to fund our housing development operations.
         </div>
-        <div style={{ fontSize: '1.01rem', color: '#444', margin: '0 0 0.7rem 0', textAlign: 'left' }}>
+        <div style={{ fontSize: '1.35rem', color: '#444', margin: '0 0 0.7rem 0', textAlign: 'left' }}>
           Track how every penny of our funds are spent in our progress page.
         </div>
       </div>
-      <div style={{ width: '100%', maxWidth: 370, background: '#f7f6f3', borderRadius: 22, padding: '2.2rem 1.5rem 2rem 1.5rem', boxShadow: '0 2px 14px rgba(0,0,0,0.07)' }}>
+      <div className="donation-box">
         <div style={{ display: 'flex', gap: 10, marginBottom: 18, flexWrap: 'wrap', justifyContent: 'center' }}>
           {PRESET_AMOUNTS.map(amt => (
             <button key={amt} onClick={() => handleAmount(amt.toFixed(2))} style={{
