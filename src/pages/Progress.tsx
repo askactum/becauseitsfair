@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function Progress() {
   // Example: 0 out of 100000 raised
   const goal = 100000;
