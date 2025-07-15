@@ -85,7 +85,6 @@ function AppLayout() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [transitioningToLab, setTransitioningToLab] = useState(false);
   const [showLab, setShowLab] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -142,9 +141,6 @@ function AppLayout() {
   return (
     <div className="main-layout fit-one-page">
       {/* White-to-black transition overlay */}
-      {transitioningToLab && (
-        <div className="lab-transition-overlay" />
-      )}
       {/* Top nav for mobile/tablet/small screens */}
       {isMobile && (
         <header className="top-nav mobile-dropdown-nav" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', zIndex: 1000, background: '#fff', boxShadow: '0 2px 16px rgba(0,0,0,0.07)' }}>

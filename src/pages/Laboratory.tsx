@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import './Laboratory.css';
-import logo from '../assets/ACTUM_white.png';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import LabAuthModal from './LabAuthModal';
@@ -20,8 +19,6 @@ import volunteerslogo from '../assets/lab_logos/volunteerslogo.png';
 import medialogo from '../assets/lab_logos/medialogo.png';
 import ethicslogo from '../assets/lab_logos/ethicslogo.png';
 import storieslogo from '../assets/lab_logos/storieslogo.png';
-import RichTextEditor from '../components/RichTextEditor';
-import * as Select from '@radix-ui/react-select';
 import ActumOfficialLogo from '../assets/ACTUM_white.png';
 
 const categoryLogos: Record<string, string> = {
@@ -38,38 +35,9 @@ const categoryLogos: Record<string, string> = {
   stories: storieslogo,
 };
 
-const mockPosts = [
-  {
-    id: 1,
-    category: 'strategy',
-    title: "idk why you can’t just use shipping containers?",
-    author: '🇫🇷',
-    time: '2 days ago',
-    content: "i feel like it would save a lot of money. anyone else agree? cause other countries use them? i went on a trip and saw that they were actually a feasible option because....",
-    votes: 4500,
-    comments: [
-      { user: 'wispyfern', text: 'Exactly what I came here to say!!!', votes: 30 },
-      { user: 'KalliMae', text: 'This right here.', votes: 29 },
-      { user: 'Sunshine_0203', text: 'Absolutely this!!!!', votes: 13 },
-      { user: 'lulugingerspice', text: 'I put down a ring to wash dishes many years ago. It got lost for 3 years. Ever since then, every time it’s off my finger, it’s in my direct line of sight because I’m so paranoid that I might lose it again.', votes: 8 },
-    ],
-  },
-  {
-    id: 2,
-    category: 'design',
-    title: "How do we make the units feel like home?",
-    author: '🇺🇸',
-    time: '1 day ago',
-    content: "What are some design elements that make a space feel welcoming and not institutional?",
-    votes: 1200,
-    comments: [],
-  },
-];
-
 export default function Laboratory() {
   const [categories, setCategories] = useState<{ id: number, label: string, icon: string, color: string, description?: string }[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(true);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
@@ -103,8 +71,6 @@ export default function Laboratory() {
   const [monthlyPromptCommentLoading, setMonthlyPromptCommentLoading] = useState(false);
   const [monthlyPromptCommentError, setMonthlyPromptCommentError] = useState<string | null>(null);
   const [userPromptCommentVotes, setUserPromptCommentVotes] = useState<number[]>([]);
-  const [promptCommentsPage, setPromptCommentsPage] = useState(1);
-  const PROMPT_COMMENTS_PER_PAGE = 10;
 
   const [newPrompt, setNewPrompt] = useState('');
   const [newPromptLoading, setNewPromptLoading] = useState(false);
@@ -719,7 +685,6 @@ export default function Laboratory() {
             const cat = categories.find(c => c.label === selectedCategory);
             return cat && post.category_id === cat.id;
           }).map(post => {
-            const cat = categories.find(c => c.id === post.category_id);
             const author = profiles.find(p => p.id === post.user_id);
             return (
               <div key={post.id} style={{ background: '#222', borderRadius: 12, marginBottom: 32, boxShadow: '0 2px 16px rgba(0,0,0,0.13)', padding: '1.5rem 1.5rem 1.2rem 1.5rem', color: '#fff' }}>
@@ -778,7 +743,7 @@ export default function Laboratory() {
                     .filter(c => c.post_id === post.id)
                     .sort((a, b) => (b.votes || 0) - (a.votes || 0))
                     .slice(0, 3)
-                    .map((c, i) => {
+                    .map(c => {
                       const commenter = profiles.find(p => p.id === c.user_id);
                       return (
                         <div key={c.id} style={{ color: '#fff', marginBottom: 8, fontSize: 15, display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'space-between' }}>
@@ -1111,7 +1076,7 @@ export default function Laboratory() {
                       .filter(c => c.post_id === activePost.id)
                       .sort((a, b) => (b.votes || 0) - (a.votes || 0))
                       .slice((modalPage - 1) * COMMENTS_PER_PAGE, modalPage * COMMENTS_PER_PAGE)
-                      .map((c, i) => {
+                      .map(c => {
                         const commenter = profiles.find(p => p.id === c.user_id);
                         return (
                           <div key={c.id} style={{ color: '#fff', marginBottom: 8, fontSize: 15, display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'space-between' }}>
