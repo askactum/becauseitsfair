@@ -1,0 +1,28 @@
+.rich-text-editor {
+  min-height: 220px;
+  background: #222;
+  color: #fff;
+  border-radius: 8px;
+  border: 1.5px solid #444;
+  padding: 1rem;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+.rte-toolbar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.rte-toolbar button {
+  background: #18171c;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.rte-toolbar button.active, .rte-toolbar button:hover {
+  background: #444;
+} 

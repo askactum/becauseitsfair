@@ -1,6 +1,7 @@
 import './App.css';
 import './fade-transition.css';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import logo from './assets/Actum_Official_Logo.jpg';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
@@ -10,6 +11,7 @@ import Plan from './pages/Plan';
 import Donate from './pages/Donate';
 import Contact from './pages/Contact';
 import Laboratory from './pages/Laboratory';
+import LabTransition from './pages/LabTransition';
 import Shop from './pages/Shop';
 import Progress from './pages/Progress';
 import Applications from './pages/Applications';
@@ -54,6 +56,7 @@ function AnimatedRoutes() {
           { path: '/progress', element: <Progress /> },
           { path: '/donate', element: <Donate /> },
           { path: '/contact', element: <Contact /> },
+          { path: '/lab-transition', element: <LabTransition /> },
           { path: '/laboratory', element: <Laboratory /> },
           { path: '/shop', element: <Shop /> },
           { path: '/applications', element: <Applications /> },
@@ -63,10 +66,10 @@ function AnimatedRoutes() {
             path={path}
             element={
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
               >
                 {element}
               </motion.div>
@@ -82,7 +85,10 @@ function AppLayout() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [transitioningToLab, setTransitioningToLab] = useState(false);
+  const [showLab, setShowLab] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Responsive detection for mobile and smaller screens
   useEffect(() => {
@@ -113,8 +119,32 @@ function AppLayout() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, [showMobileMenu]);
 
+  // Intercept navigation to /laboratory for transition
+  useEffect(() => {
+    if (location.pathname === '/laboratory' && !showLab) {
+      setShowLab(true);
+    } else if (location.pathname !== '/laboratory' && showLab) {
+      setShowLab(false);
+    }
+  }, [location.pathname]);
+
+  // Custom handler for Lab link click
+  function handleLabClick(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
+    e.preventDefault();
+    navigate('/lab-transition');
+  }
+
+  // If on /laboratory, render the Laboratory page as a full entity (with its own sidebar)
+  if (location.pathname === '/laboratory') {
+    return <Laboratory />;
+  }
+
   return (
     <div className="main-layout fit-one-page">
+      {/* White-to-black transition overlay */}
+      {transitioningToLab && (
+        <div className="lab-transition-overlay" />
+      )}
       {/* Top nav for mobile/tablet/small screens */}
       {isMobile && (
         <header className="top-nav mobile-dropdown-nav" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', zIndex: 1000, background: '#fff', boxShadow: '0 2px 16px rgba(0,0,0,0.07)' }}>
@@ -158,15 +188,27 @@ function AppLayout() {
           {showDropdown && (
             <nav className="dropdown-menu" style={{width: '100%', background: '#fff', border: '1px solid #eee', borderTop: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.07)'}}>
               {sidebarLinks.map((link) => (
-                <Link
-                  key={link.label}
-                  to={link.href}
-                  className={`dropdown-link${location.pathname === link.href ? ' active' : ''}`}
-                  style={{display: 'block', padding: '1rem 1.5rem', color: '#222', textDecoration: 'none', fontFamily: 'Georgia, serif', fontSize: '1.1rem'}}
-                  onClick={() => setShowDropdown(false)}
-                >
-                  {link.label}
-                </Link>
+                link.href === '/laboratory' ? (
+                  <Link
+                    key={link.label}
+                    to={link.href}
+                    className={`dropdown-link${location.pathname === link.href ? ' active' : ''}`}
+                    style={{display: 'block', padding: '1rem 1.5rem', color: '#222', textDecoration: 'none', fontFamily: 'Georgia, serif', fontSize: '1.1rem'}}
+                    onClick={e => { handleLabClick(e); setShowDropdown(false); }}
+                  >
+                    {link.label}
+                  </Link>
+                ) : (
+                  <Link
+                    key={link.label}
+                    to={link.href}
+                    className={`dropdown-link${location.pathname === link.href ? ' active' : ''}`}
+                    style={{display: 'block', padding: '1rem 1.5rem', color: '#222', textDecoration: 'none', fontFamily: 'Georgia, serif', fontSize: '1.1rem'}}
+                    onClick={() => setShowDropdown(false)}
+                  >
+                    {link.label}
+                  </Link>
+                )
               ))}
             </nav>
           )}
@@ -187,13 +229,24 @@ function AppLayout() {
                 const isActive = location.pathname === link.href;
                 return (
                   <div key={link.label} className="sidebar-link-block">
-                    <Link
-                      to={link.href}
-                      className={`sidebar-link main-link${isActive ? ' active' : ''}`}
-                    >
-                      {link.label}
-                      {isActive && <div className="underline" />}
-                    </Link>
+                    {link.href === '/laboratory' ? (
+                      <Link
+                        to={link.href}
+                        className={`sidebar-link main-link${isActive ? ' active' : ''}`}
+                        onClick={handleLabClick}
+                      >
+                        {link.label}
+                        {isActive && <div className="underline" />}
+                      </Link>
+                    ) : (
+                      <Link
+                        to={link.href}
+                        className={`sidebar-link main-link${isActive ? ' active' : ''}`}
+                      >
+                        {link.label}
+                        {isActive && <div className="underline" />}
+                      </Link>
+                    )}
                   </div>
                 );
               })}
@@ -229,9 +282,15 @@ function AppLayout() {
                 <Link to="/donate" className="floating-icon" title="Donate" style={{ position: 'static' }}>
                   <img src={donateImg} alt="Donate" />
                 </Link>
-                <Link to="/laboratory" className="floating-icon" title="Visit the Lab" style={{ position: 'static' }}>
+                <a
+                  href="/laboratory"
+                  className="floating-icon"
+                  title="Visit the Lab"
+                  style={{ position: 'static', cursor: 'pointer' }}
+                  onClick={e => { handleLabClick(e); setShowMobileMenu(false); }}
+                >
                   <img src={labImg} alt="Visit the Lab" />
-                </Link>
+                </a>
               </div>
             )}
           </>
@@ -245,9 +304,15 @@ function AppLayout() {
             <Link to="/donate" className="floating-icon floating-donate" title="Donate">
               <img src={donateImg} alt="Donate" />
             </Link>
-            <Link to="/laboratory" className="floating-icon floating-lab" title="Visit the Lab">
+            <a
+              href="/laboratory"
+              className="floating-icon floating-lab"
+              title="Visit the Lab"
+              style={{ cursor: 'pointer' }}
+              onClick={handleLabClick}
+            >
               <img src={labImg} alt="Visit the Lab" />
-            </Link>
+            </a>
           </>
         )}
         <AnimatedRoutes />
