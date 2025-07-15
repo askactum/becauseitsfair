@@ -1,12 +1,12 @@
 import { useState } from 'react';
+import './Laboratory.css';
 
 export default function Laboratory() {
   const [cover, setCover] = useState(false);
 
   return (
     <div
-      className="page-content lab-page"
-      style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#000', position: 'relative', overflow: 'hidden', cursor: 'pointer' }}
+      className="page-content lab-page laboratory-center"
       onClick={() => setCover(true)}
     >
       {/* Black overlay for transition */}

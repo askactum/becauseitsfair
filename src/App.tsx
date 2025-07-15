@@ -81,6 +81,7 @@ function AnimatedRoutes() {
 function AppLayout() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const location = useLocation();
 
   // Responsive detection for mobile and smaller screens
@@ -92,6 +93,25 @@ function AppLayout() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Close mobile menu when navigating
+  useEffect(() => {
+    setShowMobileMenu(false);
+  }, [location]);
+
+  // Close menu on outside click
+  useEffect(() => {
+    if (!showMobileMenu) return;
+    function handleClick(e: MouseEvent) {
+      const menu = document.getElementById('mobile-floating-menu');
+      const gear = document.getElementById('mobile-gear-icon');
+      if (menu && !menu.contains(e.target as Node) && gear && !gear.contains(e.target as Node)) {
+        setShowMobileMenu(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [showMobileMenu]);
 
   return (
     <div className="main-layout fit-one-page">
@@ -189,16 +209,47 @@ function AppLayout() {
         </div>
       )}
       <div className="content-area with-sidebar" style={{ marginTop: isMobile ? 60 : 0 }}>
-        {/* Persistent floating icons */}
-        <Link to="/shop" className="floating-icon floating-shop" title="Shop">
-          <img src={shopImg} alt="Shop" />
-        </Link>
-        <Link to="/donate" className="floating-icon floating-donate" title="Donate">
-          <img src={donateImg} alt="Donate" />
-        </Link>
-        <Link to="/laboratory" className="floating-icon floating-lab" title="Visit the Lab">
-          <img src={labImg} alt="Visit the Lab" />
-        </Link>
+        {/* Mobile floating gear icon and menu */}
+        {isMobile && (
+          <>
+            <button
+              id="mobile-gear-icon"
+              className="floating-icon floating-gear"
+              style={{ left: 10, bottom: 10, zIndex: 2100, border: 'none', position: 'fixed', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 16 }}
+              aria-label="Open quick menu"
+              onClick={() => setShowMobileMenu((s) => !s)}
+            >
+              <GridIcon size={32} color="#222" />
+            </button>
+            {showMobileMenu && (
+              <div id="mobile-floating-menu" style={{ position: 'fixed', left: 10, bottom: 80, zIndex: 2200, padding: '1.1rem 1.2rem', display: 'flex', flexDirection: 'column', gap: '1.1rem', alignItems: 'center', borderRadius: 16 }}>
+                <Link to="/shop" className="floating-icon" title="Shop" style={{ position: 'static' }}>
+                  <img src={shopImg} alt="Shop" />
+                </Link>
+                <Link to="/donate" className="floating-icon" title="Donate" style={{ position: 'static' }}>
+                  <img src={donateImg} alt="Donate" />
+                </Link>
+                <Link to="/laboratory" className="floating-icon" title="Visit the Lab" style={{ position: 'static' }}>
+                  <img src={labImg} alt="Visit the Lab" />
+                </Link>
+              </div>
+            )}
+          </>
+        )}
+        {/* Persistent floating icons for desktop only */}
+        {!isMobile && (
+          <>
+            <Link to="/shop" className="floating-icon floating-shop" title="Shop">
+              <img src={shopImg} alt="Shop" />
+            </Link>
+            <Link to="/donate" className="floating-icon floating-donate" title="Donate">
+              <img src={donateImg} alt="Donate" />
+            </Link>
+            <Link to="/laboratory" className="floating-icon floating-lab" title="Visit the Lab">
+              <img src={labImg} alt="Visit the Lab" />
+            </Link>
+          </>
+        )}
         <AnimatedRoutes />
       </div>
     </div>
@@ -214,3 +265,20 @@ function App() {
 }
 
 export default App;
+
+// Add GridIcon component
+const GridIcon = ({ size = 32, color = '#222' }) => (
+  <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {[0, 1, 2].map(row =>
+      [0, 1, 2].map(col => (
+        <circle
+          key={`${row}-${col}`}
+          cx={5 + col * 12}
+          cy={5 + row * 12}
+          r={3.5}
+          fill={color}
+        />
+      ))
+    )}
+  </svg>
+);

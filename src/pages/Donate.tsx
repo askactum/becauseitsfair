@@ -106,10 +106,13 @@ const Donate: React.FC = () => {
     };
   }, []);
 
+  // Responsive heading margin
+  const headingMarginTop = typeof window !== 'undefined' && window.innerWidth <= 700 ? '2.5rem' : '5rem';
+
   return (
-    <div className="donate-outer" style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div className="donate-outer donate-center">
       <div style={{ width: '100%' }}>
-        <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 400, fontSize: '4rem', margin: '5rem 0 2.5rem 0', textAlign: 'center', zIndex: 1 }}>give.</h1>
+        <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 400, fontSize: '4rem', margin: `${headingMarginTop} 0 2.5rem 0`, textAlign: 'center', zIndex: 1 }}>give.</h1>
       </div>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
         <div className="donation-box" style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center', gap: '3.5rem', background: 'none', boxShadow: 'none', padding: 0, borderRadius: 0, marginBottom: 0, zIndex: 1 }}>
@@ -135,7 +138,7 @@ const Donate: React.FC = () => {
           ))}
         </div>
       </div>
-      <div style={{ marginTop: '2.5rem', marginBottom: '2rem', fontStyle: 'italic', fontSize: '1.18rem', color: '#222', fontFamily: 'Georgia, serif', textAlign: 'center', maxWidth: 600, zIndex: 0 }}>
+      <div style={{ marginTop: '1rem', marginBottom: '2rem', fontStyle: 'italic', fontSize: '1.18rem', color: '#222', fontFamily: 'Georgia, serif', textAlign: 'center', maxWidth: 600, zIndex: 0 }}>
         We are a non-profit organization pending 501(c)(3) status.<br />
         100% of proceeds support the mission to fund our housing development operations.
       </div>

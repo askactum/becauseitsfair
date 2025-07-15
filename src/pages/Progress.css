@@ -1,0 +1,103 @@
+.progress-container {
+  min-height: 100vh;
+  background: #fff;
+  color: #111;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: Georgia, serif;
+}
+
+.progress-stat-block {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 3rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.progress-stat-block img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  margin-right: 32px;
+  background: #f7f6f3;
+  border-radius: 16px;
+}
+
+.progress-stat-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.progress-stat-title {
+  font-size: 1.3rem;
+  margin-bottom: 0.7rem;
+}
+
+.progress-stat-value {
+  font-size: 2.5rem;
+  font-weight: 400;
+}
+
+.progress-date {
+  margin-top: 2.2rem;
+  font-style: italic;
+  font-size: 1.1rem;
+  color: #888;
+  text-align: center;
+}
+
+@media (max-width: 700px) {
+  .progress-container {
+    height: calc(100dvh - 100px);
+    min-height: unset;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    font-family: Georgia, serif;
+    background: #fff;
+    color: #111;
+    padding-left: max(env(safe-area-inset-left), 6vw);
+    padding-right: max(env(safe-area-inset-right), 6vw);
+    padding-top: 50px;
+    padding-bottom: 0;
+    text-align: center;
+    box-sizing: border-box;
+    width: 360px;
+  }
+  .progress-stat-block {
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1.1rem;
+    max-width: 100%;
+    width: auto;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .progress-stat-block img {
+    width: 100px;
+    height: 100px;
+    margin-right: 0;
+    margin-bottom: 0.7rem;
+  }
+  .progress-stat-text {
+    align-items: center;
+  }
+  .progress-stat-title {
+    font-size: 1.35rem;
+    margin-bottom: 0.3rem;
+  }
+  .progress-stat-value {
+    font-size: 1.5rem;
+  }
+  .progress-date {
+    font-size: 0.98rem;
+    margin-top: 0.5rem;
+  }
+} 

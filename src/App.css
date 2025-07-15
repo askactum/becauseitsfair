@@ -1208,6 +1208,8 @@ team-member-photo {
   .floating-icon {
     width: 60px;
     height: 60px;
+    /* Remove transform on click/tap for mobile */
+    transition: none;
   }
   .floating-shop {
     left: 10px;
@@ -1224,4 +1226,49 @@ team-member-photo {
     right: 10px;
     bottom: 10px;
   }
+  .floating-icon:hover,
+  .floating-icon:active {
+    transform: none !important;
+  }
+  .floating-icon.floating-shop,
+  .floating-icon.floating-donate,
+  .floating-icon.floating-lab {
+    display: none !important;
+  }
+  .floating-icon.floating-gear {
+    display: flex !important;
+    position: fixed;
+    left: 10px;
+    bottom: 10px;
+    z-index: 2100;
+    background: rgba(255,255,255,0.25);
+    border: 1.5px solid rgba(0,0,0,0.08);
+    box-shadow: 0 4px 24px 0 rgba(0,0,0,0.10);
+    border-radius: 16px;
+    width: 60px;
+    height: 60px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: none;
+  }
+}
+
+/* Style for the mobile floating menu background transparency */
+#mobile-floating-menu {
+  background: rgba(255,255,255,0.85) !important;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.13);
+  border-radius: 16px;
+}
+
+/* Make icons inside the mobile floating menu larger */
+#mobile-floating-menu .floating-icon {
+  width: 70px !important;
+  height: 70px !important;
+}
+#mobile-floating-menu .floating-icon img {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 16px;
 }

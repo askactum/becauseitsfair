@@ -1,6 +1,8 @@
+import './Shop.css';
+
 export default function Shop() {
   return (
-    <div className="page-content shop-page" style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+    <div className="page-content shop-page shop-center">
       <svg width="120" height="120" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginBottom: 32 }}>
         <rect x="3" y="7" width="18" height="13" rx="2.5" fill="#222"/>
         <rect x="1" y="7" width="22" height="2" rx="1" fill="#444"/>

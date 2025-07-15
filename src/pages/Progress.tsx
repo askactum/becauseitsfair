@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import amountImg from '../assets/amount.png';
 import homeImg from '../assets/home.png';
+import './Progress.css';
 
 function formatDisplayDate(isoString: string | null): string {
   if (!isoString) return 'N/A';
@@ -14,6 +15,14 @@ export default function Progress() {
   const [displayAmount, setDisplayAmount] = useState<number>(0);
   const [lastTransactionDate, setLastTransactionDate] = useState<string | null>(null);
   const animationRef = useRef<number | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 700);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Fetch the real amount (placeholder for now)
   useEffect(() => {
@@ -54,43 +63,24 @@ export default function Progress() {
   }, [amount]);
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background: '#fff',
-        color: '#111',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontFamily: 'Georgia, serif',
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4rem' }}>
-        <img
-          src={amountImg}
-          alt="Amount Raised"
-          style={{ width: 260, height: 260, objectFit: 'contain', marginRight: 80, background: '#f7f6f3', borderRadius: 16 }}
-        />
-        <div>
-          <div style={{ fontSize: '2rem', marginBottom: '1.2rem' }}>total amount raised</div>
-          <div style={{ fontSize: '4.5rem', fontWeight: 400 }}>
+    <div className="progress-container">
+      <div className="progress-stat-block">
+        <img src={amountImg} alt="Amount Raised" />
+        <div className="progress-stat-text">
+          <div className="progress-stat-title">total amount raised</div>
+          <div className="progress-stat-value">
             {amount !== null ? `$${displayAmount.toLocaleString()}` : '...'}
           </div>
         </div>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <img
-          src={homeImg}
-          alt="Homes Built"
-          style={{ width: 260, height: 260, objectFit: 'contain', marginRight: 80, background: '#f7f6f3', borderRadius: 16 }}
-        />
-        <div>
-          <div style={{ fontSize: '2rem', marginBottom: '1.2rem' }}>total homes built</div>
-          <div style={{ fontSize: '4.5rem', fontWeight: 400 }}>{homesBuilt}</div>
+      <div className="progress-stat-block">
+        <img src={homeImg} alt="Homes Built" />
+        <div className="progress-stat-text">
+          <div className="progress-stat-title">total homes built</div>
+          <div className="progress-stat-value">{homesBuilt}</div>
         </div>
       </div>
-      <div style={{ marginTop: '3rem', fontStyle: 'italic', fontSize: '1.1rem', color: '#888' }}>
+      <div className="progress-date">
         as of: {formatDisplayDate(lastTransactionDate)}.
       </div>
     </div>
