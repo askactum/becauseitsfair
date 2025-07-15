@@ -1,8 +1,6 @@
 import { useEffect } from 'react';
 import './Donate.css';
-import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
-
-const PRESET_AMOUNTS = [5, 20, 50, 100];
+import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 
 // Updated to use PayPal integration with .env for the client ID
 const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID;
