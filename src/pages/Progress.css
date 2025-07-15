@@ -52,6 +52,13 @@
   text-align: center;
 }
 
+.progress-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
 @media (max-width: 700px) {
   .progress-container {
     height: calc(100dvh - 100px);
@@ -99,5 +106,18 @@
   .progress-date {
     font-size: 0.98rem;
     margin-top: 0.5rem;
+  }
+  .progress-center {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: calc(100dvh - 60px);
+    min-height: unset;
+    width: 100vw;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
   }
 } 

@@ -64,7 +64,7 @@ export default function Progress() {
   }, [amount]);
 
   return (
-    <div className="progress-container">
+    <div className="progress-container progress-center">
       <div className="progress-stat-block">
         <img src={amountImg} alt="Amount Raised" />
         <div className="progress-stat-text">
