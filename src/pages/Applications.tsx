@@ -13,7 +13,7 @@ export default function Applications() {
       textAlign: 'center',
     }}>
       <img
-        src="/src/assets/application.png"
+        src="/public/assets/application.png"
         alt="Applications Coming Soon"
         style={{ width: 200, height: 200, objectFit: 'contain', marginBottom: '2.5rem' }}
       />

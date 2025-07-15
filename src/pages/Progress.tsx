@@ -66,7 +66,7 @@ export default function Progress() {
     >
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4rem' }}>
         <img
-          src="/src/assets/amount.png"
+          src="/public/assets/amount.png"
           alt="Amount Raised"
           style={{ width: 260, height: 260, objectFit: 'contain', marginRight: 80, background: '#f7f6f3', borderRadius: 16 }}
         />
@@ -79,7 +79,7 @@ export default function Progress() {
       </div>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <img
-          src="/src/assets/home.png"
+          src="/public/assets/home.png"
           alt="Homes Built"
           style={{ width: 260, height: 260, objectFit: 'contain', marginRight: 80, background: '#f7f6f3', borderRadius: 16 }}
         />
