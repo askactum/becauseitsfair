@@ -1,12 +1,21 @@
 export default function Home() {
   return (
-    <main className="main-content">
+    <main className="main-content" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'inherit', paddingTop: '3vh' }}>
       <div className="home-content" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
-        <div className="main-title" style={{ fontSize: '2.2rem', fontWeight: 500, marginBottom: '2.2rem', textAlign: 'center' }}>
-          a nonprofit to create free, universal housing.
+        <div className="main-title" style={{ fontSize: '3.2rem', fontWeight: 500, marginBottom: '2.2rem', textAlign: 'center' }}>
+          welcome to actum.
         </div>
-        <div className="because-box" style={{ fontSize: '2.1rem', fontWeight: 700, textAlign: 'center', lineHeight: 1.1, color: '#222' }}>
-          <div>because<br/>it's<br/>fair</div>
+        <div style={{ fontSize: '1.8rem', marginBottom: '2.5rem', color: '#333', textAlign: 'center' }}>
+          we are building the first global network of rent-free homes—permanently.
+        </div>
+        <div style={{ fontSize: '1.5rem', marginBottom: '2.5rem', color: '#333', textAlign: 'left' }}>
+          real units.<br />
+          for everyone.<br />
+          forever.<br />
+          for good.
+        </div>
+        <div style={{ fontSize: '2.1rem', fontWeight: 700, textAlign: 'center', lineHeight: 1.1, color: '#222' }}>
+          because it’s fair.
         </div>
       </div>
     </main>

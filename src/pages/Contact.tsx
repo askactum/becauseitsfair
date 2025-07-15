@@ -11,7 +11,9 @@ export default function Contact() {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      justifyContent: 'center'
+      justifyContent: 'flex-start', // changed from center
+      minHeight: '100vh', // ensure full viewport height
+      paddingTop: '4.5rem', // add space from the top
     }}>
       <div style={{ width: '100%', maxWidth: 880 }}>
         <h1 style={{ fontWeight: 400, fontSize: '2.6rem', margin: '0 0 1.7rem 0', letterSpacing: '0.01em', textAlign: 'center' }}>Let's connect.</h1>

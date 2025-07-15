@@ -186,13 +186,16 @@ function AppLayout() {
         </div>
       )}
       <div className="content-area with-sidebar" style={{ marginTop: isMobile ? 60 : 0 }}>
-        <header className="top-nav always-centered">
-          <div className="nav-buttons">
-            <Link to="/shop"><button>shop</button></Link>
-            <Link to="/laboratory"><button>the laboratory</button></Link>
-            <Link to="/donate"><button>donate</button></Link>
-          </div>
-        </header>
+        {/* Persistent floating icons */}
+        <Link to="/shop" className="floating-icon floating-shop" title="Shop">
+          <img src="/src/assets/shop.png" alt="Shop" />
+        </Link>
+        <Link to="/donate" className="floating-icon floating-donate" title="Donate">
+          <img src="/src/assets/donate.png" alt="Donate" />
+        </Link>
+        <Link to="/laboratory" className="floating-icon floating-lab" title="Visit the Lab">
+          <img src="/src/assets/lab.png" alt="Visit the Lab" />
+        </Link>
         <AnimatedRoutes />
       </div>
     </div>

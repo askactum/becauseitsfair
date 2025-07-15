@@ -1,75 +1,162 @@
-import { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import './Donate.css';
-import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 
-// Updated to use PayPal integration with .env for the client ID
-const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID;
-const PAYPAL_BUTTON_ID = "HYKMLWYSDE5EL"; // Your live hosted_button_id
+const BUTTONS = [
+  {
+    id: 'house-5',
+    hosted_button_id: 'DNRKJ4BASZA2N',
+    image: 'https://pics.paypal.com/00/s/YWJkYjNiNDYtYjVkNC00N2RmLWI1MTItMjQ0NmM0ZmYwZDQ5/file.PNG',
+  },
+  {
+    id: 'house-20',
+    hosted_button_id: 'LFBC2EECY6HWG',
+    image: 'https://pics.paypal.com/00/s/Y2MzMGI4MTgtMjAzNC00MmMzLTg0ZTQtYWQxOTEzYjAxYTc4/file.PNG',
+  },
+  {
+    id: 'house-50',
+    hosted_button_id: 'A4RU6SHE3S3N8',
+    image: 'https://pics.paypal.com/00/s/Mzk3NTUzYTUtOTE2Ny00OWFiLWJiN2UtZmU5ODY0M2NiYWVh/file.PNG',
+  },
+  {
+    id: 'house-100',
+    hosted_button_id: 'YYM5CJVY88Q5A',
+    image: 'https://pics.paypal.com/00/s/MmY1YTMwYTYtMGM5Zi00OGQ5LWJiYWItNjZhYTRlMjE0ZTFm/file.PNG',
+  },
+  {
+    id: 'house-custom',
+    hosted_button_id: 'DXAGF8K7GJ7G8',
+    image: 'https://pics.paypal.com/00/s/ZWZkNzg1YTgtZWJmNS00ZWE2LWEwNTgtYTFkYzI2Mzg1YWZk/file.PNG',
+  },
+];
 
-function loadPayPalScript(callback: () => void) {
-  const scriptId = "paypal-donate-sdk";
-  if (document.getElementById(scriptId)) {
-    callback();
-    return;
-  }
-  const script = document.createElement("script");
-  script.src = "https://www.paypalobjects.com/donate/sdk/donate-sdk.js";
-  script.id = scriptId;
-  script.charset = "UTF-8";
-  script.onload = callback;
-  document.body.appendChild(script);
-}
+const BUTTON_SIZE = 150;
 
-export default function Donate() {
+const Donate: React.FC = () => {
+  const buttonRefs = [
+    useRef<HTMLDivElement>(null),
+    useRef<HTMLDivElement>(null),
+    useRef<HTMLDivElement>(null),
+    useRef<HTMLDivElement>(null),
+    useRef<HTMLDivElement>(null),
+  ];
+
   useEffect(() => {
-    loadPayPalScript(() => {
-      // @ts-ignore
-      if (window.PayPal && window.PayPal.Donation) {
-        // @ts-ignore
-        window.PayPal.Donation.Button({
-          env: "production",
-          hosted_button_id: PAYPAL_BUTTON_ID,
-          image: {
-            src: "https://pics.paypal.com/00/s/MjFmNTYwYjYtNGM2NC00MDkwLThkODUtYWJjNDBmZGU2ODQ1/file.PNG",
-            alt: "Donate with PayPal button",
-            title: "PayPal - The safer, easier way to pay online!",
-          },
-        }).render("#donate-button");
-      }
-    });
+    let script = document.querySelector('script[src*="paypalobjects.com/donate/sdk/donate-sdk.js"]');
+    if (!script) {
+      const newScript = document.createElement('script');
+      newScript.src = 'https://www.paypalobjects.com/donate/sdk/donate-sdk.js';
+      newScript.charset = 'UTF-8';
+      document.body.appendChild(newScript);
+      newScript.onload = renderButtons;
+    } else {
+      renderButtons();
+    }
+
+    function renderButtons() {
+      BUTTONS.forEach((btn, idx) => {
+        const ref = buttonRefs[idx].current;
+        if (ref) {
+          ref.innerHTML = '';
+          // @ts-ignore
+          if (window.PayPal && window.PayPal.Donation) {
+            // @ts-ignore
+            window.PayPal.Donation.Button({
+              env: 'production',
+              hosted_button_id: btn.hosted_button_id,
+              image: {
+                src: btn.image,
+                alt: 'Donate with PayPal button',
+                title: 'PayPal - The safer, easier way to pay online!',
+              },
+            }).render(`#${btn.id}`);
+          }
+        }
+      });
+    }
+
+    return () => {
+      buttonRefs.forEach(ref => { if (ref.current) ref.current.innerHTML = ''; });
+    };
   }, []);
 
   return (
-    <PayPalScriptProvider options={{ clientId: PAYPAL_CLIENT_ID }}>
-      <div className="page-content donate-page" style={{
-        maxWidth: 950,
-        minHeight: '70vh',
-        margin: '0 auto',
-        padding: '2rem 1rem',
-        fontFamily: 'Georgia, serif',
-        color: '#222',
-      }}>
-        <div className="text-content">
-          <h1 style={{ textAlign: 'left', fontWeight: 400, fontSize: '2.2rem', margin: '0 0 1.2rem 0', letterSpacing: '0.01em' }}>Give a high five.</h1>
-          <p style={{ textAlign: 'left', margin: '0 0 1.1rem 0', fontSize: '1.35rem' }}>
-            Start by giving $5 and take the first steps to ensure housing for all.
-          </p>
-          <p style={{ textAlign: 'left', margin: '0 0 2.2rem 0', fontSize: '1.35rem', color: '#444' }}>
-            As of April 8, 2025, donations are not available at this time.
-          </p>
-          <div style={{ fontStyle: 'italic', fontSize: '1.35rem', color: '#444', margin: '0 0 0.7rem 0', textAlign: 'left' }}>
-            We are a non-profit organization.<br />pending 501(c)(3) status. Your donation is <b>tax deductible.</b><br />100% of proceeds support the mission to fund our housing development operations.
-          </div>
-          <div style={{ fontSize: '1.35rem', color: '#444', margin: '0 0 0.7rem 0', textAlign: 'left' }}>
-            Track how every penny of our funds are spent in our progress page.
-          </div>
-          <div style={{ marginTop: '4rem', display: 'flex', justifyContent: 'center' }} id="donate-button"></div>
+    <div className="donate-outer" style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ width: '100%' }}>
+        <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 400, fontSize: '4rem', margin: '3rem 0 2.5rem 0', textAlign: 'center', zIndex: 1 }}>give.</h1>
+      </div>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+        <div className="donation-box" style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center', gap: '3.5rem', background: 'none', boxShadow: 'none', padding: 0, borderRadius: 0, marginBottom: 0, zIndex: 1 }}>
+          {BUTTONS.slice(0, 4).map((btn, idx) => (
+            <div key={btn.id}
+              style={{
+                background: '#fff',
+                padding: '0.7rem',
+                margin: '0 1rem',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: BUTTON_SIZE,
+                height: BUTTON_SIZE,
+                boxSizing: 'border-box',
+                position: 'relative',
+              }}
+            >
+              <div
+                id={btn.id}
+                ref={buttonRefs[idx]}
+                style={{
+                  minHeight: 45,
+                  width: BUTTON_SIZE - 20,
+                  height: BUTTON_SIZE - 20,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  margin: '0 auto',
+                }}
+              />
+            </div>
+          ))}
         </div>
-        <div className="">
-          {/* Only render the PayPal button, no amount options */}
-         
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '6rem' }}>
+          <div
+            key={BUTTONS[4].id}
+            style={{
+              background: '#fff',
+              padding: '0.7rem',
+              margin: '0 1rem',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: BUTTON_SIZE,
+              height: BUTTON_SIZE,
+              boxSizing: 'border-box',
+              position: 'relative',
+            }}
+          >
+            <div
+              id={BUTTONS[4].id}
+              ref={buttonRefs[4]}
+              style={{
+                minHeight: 45,
+                width: BUTTON_SIZE - 20,
+                height: BUTTON_SIZE - 20,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                margin: '0 auto',
+              }}
+            />
+          </div>
         </div>
       </div>
-    </PayPalScriptProvider>
+      <div style={{ marginTop: '2.5rem', marginBottom: '3.5rem', fontStyle: 'italic', fontSize: '1.18rem', color: '#222', fontFamily: 'Georgia, serif', textAlign: 'center', maxWidth: 600, zIndex: 0 }}>
+        We are a non-profit organization pending 501(c)(3) status.<br />
+        100% of proceeds support the mission to fund our housing development operations.
+      </div>
+    </div>
   );
-}
+};
+
+export default Donate;
