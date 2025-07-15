@@ -1,54 +1,72 @@
-# React + TypeScript + Vite
+# ACTUM Website
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the official ACTUM website, built with React, TypeScript, and Vite. It features a community laboratory, team pages, donation and shop functionality, and more.
 
-Currently, two official plugins are available:
+## Features
+- Modern React + TypeScript + Vite stack
+- Community Lab with posts, comments, and monthly prompts
+- Supabase for authentication, database, and real-time features
+- Responsive design for desktop and mobile
+- Admin features for moderation and prompt management
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Getting Started
 
-## Expanding the ESLint configuration
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v16 or higher recommended)
+- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
+- [Supabase](https://supabase.com/) project (see below)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Setup
+1. **Clone the repository:**
+   ```bash
+   git clone <your-repo-url>
+   cd Website
+   ```
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+2. **Install dependencies:**
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+3. **Configure Supabase:**
+   - Create a project on [Supabase](https://supabase.com/).
+   - Copy your Supabase project URL and anon/public key.
+   - Create a `.env` file in the root directory and add:
+     ```env
+     VITE_SUPABASE_URL=your-supabase-url
+     VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+     ```
+   - The app expects tables for `profiles`, `posts`, `comments`, `monthly_prompt`, and related vote tables. See `/src/supabaseClient.ts` for how Supabase is initialized.
+
+4. **Start the development server:**
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+   The site will be available at [http://localhost:5173](http://localhost:5173).
+
+## Supabase Usage
+- **Authentication:** User sign up, login, and session management.
+- **Database:** All posts, comments, profiles, and votes are stored in Supabase tables.
+- **Admin:** Tag a profile as admin (see below) for moderation and prompt management.
+
+### Making a User an Admin
+Add an `is_admin` boolean column to the `profiles` table (if not present):
+```sql
+ALTER TABLE profiles ADD COLUMN is_admin boolean DEFAULT false;
+```
+Set a user as admin:
+```sql
+UPDATE profiles SET is_admin = true WHERE id = 'USER_ID_HERE';
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Contributing
+- Please open issues or pull requests for bugs, features, or improvements.
+- Follow the existing code style and structure.
+- For Supabase schema changes, document your SQL in the PR.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+## License
+MIT (or your project license)

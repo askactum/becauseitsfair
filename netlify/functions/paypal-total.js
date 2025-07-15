@@ -23,7 +23,7 @@ export default async function handler(event, context) {
 
     let total = 0;
     let lastTransactionDate = null;
-    let start = new Date('2025-07-01T00:00:00-0700');
+    let start = new Date('2025-03-01T00:00:00-0700');
     const now = new Date();
     while (start < now) {
       let end = new Date(start);
@@ -38,10 +38,21 @@ export default async function handler(event, context) {
       });
       const data = await txnRes.json();
 
+      if (data.transaction_details && data.transaction_details.length > 0) {
+        console.log('PayPal API response:', JSON.stringify(data, null, 2));
+      }
+
       if (data.transaction_details) {
         total += data.transaction_details
-          .filter(txn => txn.transaction_info.transaction_status === 'S')
-          .reduce((sum, txn) => sum + parseFloat(txn.transaction_info.transaction_amount.value), 0);
+          .filter(txn => {
+            const amount = parseFloat(txn.transaction_info.transaction_amount.value);
+            return amount > 0 && txn.transaction_info.transaction_status === 'S';
+          })
+          .reduce((sum, txn) => {
+            const amount = parseFloat(txn.transaction_info.transaction_amount.value);
+            const fee = txn.transaction_info.fee_amount ? parseFloat(txn.transaction_info.fee_amount.value) : 0;
+            return sum + (amount + fee); // fee is negative, so amount + fee = net received
+          }, 0);
 
         // Find the latest transaction date
         for (const txn of data.transaction_details) {
@@ -61,7 +72,7 @@ export default async function handler(event, context) {
 
     return new Response(
       JSON.stringify({
-        total,
+        total: Number(total.toFixed(2)),
         last_transaction_date: lastTransactionDate ? lastTransactionDate.toISOString() : null
       }),
       {
