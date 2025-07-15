@@ -1,6 +1,6 @@
 export default function Progress() {
   // Example: 0 out of 100000 raised
-  const goal = 100000;
+  const goal = 8000000;
   const raised = 0;
   const percent = Math.min(100, Math.round((raised / goal) * 100));
 
@@ -50,7 +50,7 @@ export default function Progress() {
             </div>
           </div>
           <ul style={{ fontSize: '1.35rem', lineHeight: 1.7 }}>
-            <li>Goal: $100,000 for first Actum residence <span style={{ color: '#2d4c8d', fontWeight: 600 }}>[In Progress]</span></li>
+            <li>Goal: $8,000,000 for first Actum residence <span style={{ color: '#555', fontWeight: 600 }}>[In Progress]</span></li>
             <li>Raised so far: <b>$0</b> (Donations opening soon)</li>
           </ul>
         </section>
@@ -71,7 +71,7 @@ export default function Progress() {
                 fontSize: '0.9rem'
               }}>1</div>
               <div style={{ fontSize: '1.35rem', lineHeight: 1.5 }}>
-                501(c)(3) nonprofit status: <span style={{ color: '#2d4c8d', fontWeight: 600 }}>Pending</span>
+                501(c)(3) nonprofit status: <span style={{ color: '#555', fontWeight: 600 }}>Pending</span>
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -88,7 +88,7 @@ export default function Progress() {
                 fontSize: '0.9rem'
               }}>2</div>
               <div style={{ fontSize: '1.35rem', lineHeight: 1.5 }}>
-                Secure land for first housing unit: <span style={{ color: '#2d4c8d', fontWeight: 600 }}>Upcoming</span>
+                Secure land for first housing unit: <span style={{ color: '#555', fontWeight: 600 }}>Upcoming</span>
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -105,7 +105,7 @@ export default function Progress() {
                 fontSize: '0.9rem'
               }}>3</div>
               <div style={{ fontSize: '1.35rem', lineHeight: 1.5 }}>
-                Open applications for housing: <span style={{ color: '#2d4c8d', fontWeight: 600 }}>Upcoming</span>
+                Open applications for housing: <span style={{ color: '#555', fontWeight: 600 }}>Upcoming</span>
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -122,7 +122,7 @@ export default function Progress() {
                 fontSize: '0.9rem'
               }}>4</div>
               <div style={{ fontSize: '1.35rem', lineHeight: 1.5 }}>
-                Launch donation platform: <span style={{ color: '#2d4c8d', fontWeight: 600 }}>Upcoming</span>
+                Launch donation platform: <span style={{ color: '#555', fontWeight: 600 }}>Upcoming</span>
               </div>
             </div>
           </div>
@@ -285,4 +285,4 @@ export default function Progress() {
       `}</style>
     </div>
   );
-} 
+}
