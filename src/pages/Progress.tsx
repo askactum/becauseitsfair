@@ -1,4 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
+import amountImg from '../assets/amount.png';
+import homeImg from '../assets/home.png';
 
 function formatDisplayDate(isoString: string | null): string {
   if (!isoString) return 'N/A';
@@ -66,7 +68,7 @@ export default function Progress() {
     >
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4rem' }}>
         <img
-          src="/public/assets/amount.png"
+          src={amountImg}
           alt="Amount Raised"
           style={{ width: 260, height: 260, objectFit: 'contain', marginRight: 80, background: '#f7f6f3', borderRadius: 16 }}
         />
@@ -79,7 +81,7 @@ export default function Progress() {
       </div>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <img
-          src="/public/assets/home.png"
+          src={homeImg}
           alt="Homes Built"
           style={{ width: 260, height: 260, objectFit: 'contain', marginRight: 80, background: '#f7f6f3', borderRadius: 16 }}
         />

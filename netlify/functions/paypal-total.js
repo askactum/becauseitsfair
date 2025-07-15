@@ -11,7 +11,7 @@ function formatDate(date) {
   return `${yyyy}-${mm}-${dd}T${hh}:${min}:${ss}-0700`;
 }
 
-exports.handler = async function(event, context) {
+export default async function handler(event, context) {
   try {
     const auth = Buffer.from(`${process.env.VITE_PAYPAL_CLIENT_ID}:${process.env.VITE_PAYPAL_SECRET}`).toString('base64');
     const tokenRes = await fetch('https://api-m.paypal.com/v1/oauth2/token', {
@@ -73,4 +73,4 @@ exports.handler = async function(event, context) {
       body: JSON.stringify({ error: err.message })
     };
   }
-};
+}

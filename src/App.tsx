@@ -15,6 +15,9 @@ import Progress from './pages/Progress';
 import Applications from './pages/Applications';
 import { FaYoutube, FaInstagram, FaFacebook, FaTiktok, FaXTwitter, FaTwitch } from 'react-icons/fa6';
 import { AnimatePresence, motion } from 'framer-motion';
+import shopImg from './assets/shop.png';
+import donateImg from './assets/donate.png';
+import labImg from './assets/lab.png';
 
 const sidebarLinks = [
   { label: 'mission', href: '/mission' },
@@ -188,13 +191,13 @@ function AppLayout() {
       <div className="content-area with-sidebar" style={{ marginTop: isMobile ? 60 : 0 }}>
         {/* Persistent floating icons */}
         <Link to="/shop" className="floating-icon floating-shop" title="Shop">
-          <img src="/public/assets/shop.png" alt="Shop" />
+          <img src={shopImg} alt="Shop" />
         </Link>
         <Link to="/donate" className="floating-icon floating-donate" title="Donate">
-          <img src="/public/assets/donate.png" alt="Donate" />
+          <img src={donateImg} alt="Donate" />
         </Link>
         <Link to="/laboratory" className="floating-icon floating-lab" title="Visit the Lab">
-          <img src="/public/assets/lab.png" alt="Visit the Lab" />
+          <img src={labImg} alt="Visit the Lab" />
         </Link>
         <AnimatedRoutes />
       </div>

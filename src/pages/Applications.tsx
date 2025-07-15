@@ -1,3 +1,5 @@
+import applicationImg from '../assets/application.png';
+
 export default function Applications() {
   return (
     <div style={{
@@ -13,7 +15,7 @@ export default function Applications() {
       textAlign: 'center',
     }}>
       <img
-        src="/public/assets/application.png"
+        src={applicationImg}
         alt="Applications Coming Soon"
         style={{ width: 200, height: 200, objectFit: 'contain', marginBottom: '2.5rem' }}
       />
