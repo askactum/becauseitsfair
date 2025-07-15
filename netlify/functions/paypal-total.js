@@ -59,18 +59,24 @@ export default async function handler(event, context) {
       start.setSeconds(start.getSeconds() + 1);
     }
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
+    return new Response(
+      JSON.stringify({
         total,
         last_transaction_date: lastTransactionDate ? lastTransactionDate.toISOString() : null
-      })
-    };
+      }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
   } catch (err) {
     console.error('Function error:', err);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: err.message })
-    };
+    return new Response(
+      JSON.stringify({ error: err.message }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
   }
 }
