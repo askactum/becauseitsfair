@@ -127,7 +127,7 @@ const Donate: React.FC = () => {
           ))}
         </div>
         <div className="custom-button-row" style={{ display: 'flex', justifyContent: 'center' }}>
-          {BUTTONS.filter(btn => btn.isCustom).map((btn, idx) => (
+          {BUTTONS.filter(btn => btn.isCustom).map((btn) => (
             <div className="donation-custom" key={btn.id} style={buttonContainerStyle}>
               <div
                 id={btn.id}

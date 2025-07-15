@@ -15,10 +15,11 @@ export default function Progress() {
   const [displayAmount, setDisplayAmount] = useState<number>(0);
   const [lastTransactionDate, setLastTransactionDate] = useState<string | null>(null);
   const animationRef = useRef<number | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 700);
+    const handleResize = () => {
+      // Removed: setIsMobile(window.innerWidth <= 700);
+    };
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
