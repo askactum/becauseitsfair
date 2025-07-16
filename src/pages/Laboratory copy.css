@@ -355,57 +355,6 @@
   transform: scale(0.95);
 }
 
-/* Vote count pill/badge */
-.lab-vote-group {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  background: linear-gradient(90deg, #7b6cff 0%, #5a3aff 100%);
-  color: #fff;
-  border-radius: 999px;
-  padding: 0.32em 1.1em 0.32em 1em;
-  font-size: 1.18rem;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(90,58,255,0.13);
-  min-width: 48px;
-  min-height: 36px;
-  transition: box-shadow 0.13s, background 0.13s;
-}
-.lab-vote-group .lab-heart-btn {
-  font-size: 1.45rem;
-  margin-left: 0.2em;
-  margin-right: -0.2em;
-  transition: color 0.13s, transform 0.13s;
-}
-.lab-vote-group .lab-heart-btn.liked {
-  color: #ff3b4a;
-}
-.lab-vote-group .lab-heart-btn:hover {
-  color: #ff3b4a;
-  transform: scale(1.18);
-}
-
-/* For comment vote group, slightly smaller */
-.lab-comment-vote-group {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  background: #28273a;
-  color: #fff;
-  border-radius: 999px;
-  padding: 0.18em 0.9em 0.18em 0.8em;
-  font-size: 1.05rem;
-  font-weight: 700;
-  min-width: 38px;
-  min-height: 28px;
-  box-shadow: 0 1px 4px rgba(90,58,255,0.10);
-}
-.lab-comment-vote-group .lab-heart-btn {
-  font-size: 1.18rem;
-  margin-left: 0.1em;
-  margin-right: -0.1em;
-}
-
 .lab-hamburger {
   display: none;
 }

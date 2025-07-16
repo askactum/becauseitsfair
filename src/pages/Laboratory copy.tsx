@@ -746,17 +746,17 @@ export default function Laboratory() {
                       )}
                       <span className="lab-thread-username">{author?.username || 'Anon'}</span>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
-                        <div className="lab-vote-group">
-                          <span title="Votes">{post.votes?.toLocaleString?.() || 0}</span>
-                          <button
-                            onClick={() => handleUpvotePost(post.id)}
-                            disabled={!user}
-                            className={`lab-heart-btn${userPostVotes.includes(post.id) ? ' liked' : ''}`}
-                            title={userPostVotes.includes(post.id) ? 'Unlike' : 'Like'}
-                          >
-                            {userPostVotes.includes(post.id) ? <FaHeart /> : <FaRegHeart />}
-                          </button>
-                        </div>
+                        <span title="Votes" style={{ fontWeight: 700, fontSize: 20, display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <span role="img" aria-label="Upvotes">▲</span> {post.votes?.toLocaleString?.() || 0}
+                        </span>
+                        <button
+                          onClick={() => handleUpvotePost(post.id)}
+                          disabled={!user}
+                          className={`lab-heart-btn${userPostVotes.includes(post.id) ? ' liked' : ''}`}
+                          title={userPostVotes.includes(post.id) ? 'Unlike' : 'Like'}
+                        >
+                          {userPostVotes.includes(post.id) ? <FaHeart /> : <FaRegHeart />}
+                        </button>
                       </div>
                     </div>
                     <h2
@@ -797,17 +797,17 @@ export default function Laboratory() {
                                 <span className="lab-comment-username">{commenter.username || 'Anon'}</span>
                                 <span style={{ marginLeft: 8, color: '#bdbdbd' }}>{c.content}</span>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginLeft: 'auto' }}>
-                                  <div className="lab-comment-vote-group">
-                                    <span title="Votes">{c.votes?.toLocaleString?.() || 0}</span>
-                                    <button
-                                      onClick={() => handleUpvoteComment(c.id)}
-                                      disabled={!user}
-                                      className={`lab-heart-btn${userCommentVotes.includes(c.id) ? ' liked' : ''}`}
-                                      title={userCommentVotes.includes(c.id) ? 'Unlike' : 'Like'}
-                                    >
-                                      {userCommentVotes.includes(c.id) ? <FaHeart /> : <FaRegHeart />}
-                                    </button>
-                                  </div>
+                                  <span title="Votes" style={{ fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', gap: 2 }}>
+                                    <span role="img" aria-label="Upvotes">▲</span> {c.votes?.toLocaleString?.() || 0}
+                                  </span>
+                                  <button
+                                    onClick={() => handleUpvoteComment(c.id)}
+                                    disabled={!user}
+                                    className={`lab-heart-btn${userCommentVotes.includes(c.id) ? ' liked' : ''}`}
+                                    title={userCommentVotes.includes(c.id) ? 'Unlike' : 'Like'}
+                                  >
+                                    {userCommentVotes.includes(c.id) ? <FaHeart /> : <FaRegHeart />}
+                                  </button>
                                 </div>
                               </div>
                             </div>
@@ -885,17 +885,17 @@ export default function Laboratory() {
                             <span className="lab-comment-username">{commenter.username || 'Anon'}</span>
                             <span style={{ marginLeft: 8, color: '#bdbdbd' }}>{c.content}</span>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, minWidth: 24, marginLeft: 'auto' }}>
-                              <div className="lab-comment-vote-group">
-                                <span title="Votes">{c.votes?.toLocaleString?.() || 0}</span>
-                                <button
-                                  onClick={() => handleUpvotePromptComment(c.id)}
-                                  disabled={!user}
-                                  className={`lab-heart-btn${userPromptCommentVotes.includes(c.id) ? ' liked' : ''}`}
-                                  title={userPromptCommentVotes.includes(c.id) ? 'Unlike' : 'Like'}
-                                >
-                                  {userPromptCommentVotes.includes(c.id) ? <FaHeart /> : <FaRegHeart />}
-                                </button>
-                              </div>
+                              <span title="Votes" style={{ fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', gap: 2 }}>
+                                <span role="img" aria-label="Upvotes">▲</span> {c.votes?.toLocaleString?.() || 0}
+                              </span>
+                              <button
+                                onClick={() => handleUpvotePromptComment(c.id)}
+                                disabled={!user}
+                                className={`lab-heart-btn${userPromptCommentVotes.includes(c.id) ? ' liked' : ''}`}
+                                title={userPromptCommentVotes.includes(c.id) ? 'Unlike' : 'Like'}
+                              >
+                                {userPromptCommentVotes.includes(c.id) ? <FaHeart /> : <FaRegHeart />}
+                              </button>
                             </div>
                             {(commenter.id === user?.id || profile?.is_admin) && (
                               <button
