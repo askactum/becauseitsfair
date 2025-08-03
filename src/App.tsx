@@ -12,6 +12,7 @@ import Donate from './pages/Donate';
 import Contact from './pages/Contact';
 import Laboratory from './pages/Laboratory';
 import LabTransition from './pages/LabTransition';
+import { LabEntryPrompt } from './pages/LabTransition';
 import Shop from './pages/Shop';
 import Progress from './pages/Progress';
 import Applications from './pages/Applications';
@@ -20,6 +21,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import shopImg from './assets/shop.png';
 import donateImg from './assets/donate.png';
 import labImg from './assets/lab.png';
+import Lab from './pages/Lab';
 
 const sidebarLinks = [
   { label: 'mission', href: '/mission' },
@@ -29,7 +31,7 @@ const sidebarLinks = [
   { label: 'application for housing', href: '/applications' },
   { label: 'donate', href: '/donate' },
   { label: 'contact', href: '/contact' },
-  { label: 'the laboratory', href: '/laboratory' },
+  { label: 'the laboratory', href: '/lab' },
   { label: 'shop', href: '/shop' },
 ];
 
@@ -57,6 +59,7 @@ function AnimatedRoutes() {
           { path: '/donate', element: <Donate /> },
           { path: '/contact', element: <Contact /> },
           { path: '/lab-transition', element: <LabTransition /> },
+          { path: '/lab', element: <Lab /> },
           { path: '/laboratory', element: <Laboratory /> },
           { path: '/shop', element: <Shop /> },
           { path: '/applications', element: <Applications /> },
@@ -130,12 +133,7 @@ function AppLayout() {
   // Custom handler for Lab link click
   function handleLabClick(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
     e.preventDefault();
-    navigate('/lab-transition');
-  }
-
-  // If on /laboratory, render the Laboratory page as a full entity (with its own sidebar)
-  if (location.pathname === '/laboratory') {
-    return <Laboratory />;
+    navigate('/lab');
   }
 
   return (
@@ -184,7 +182,7 @@ function AppLayout() {
           {showDropdown && (
             <nav className="dropdown-menu" style={{width: '100%', background: '#fff', border: '1px solid #eee', borderTop: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.07)'}}>
               {sidebarLinks.map((link) => (
-                link.href === '/laboratory' ? (
+                link.href === '/lab' ? (
                   <Link
                     key={link.label}
                     to={link.href}
@@ -225,7 +223,7 @@ function AppLayout() {
                 const isActive = location.pathname === link.href;
                 return (
                   <div key={link.label} className="sidebar-link-block">
-                    {link.href === '/laboratory' ? (
+                    {link.href === '/lab' ? (
                       <Link
                         to={link.href}
                         className={`sidebar-link main-link${isActive ? ' active' : ''}`}

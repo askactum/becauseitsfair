@@ -31,12 +31,12 @@
   gap: 3.5rem;
 }
 
-.donation-box img {
+/* .donation-box img {
   max-width: 200px !important;
   max-height: 200px !important;
   width: 200px !important;
   height: 200px !important;
-}
+} */
 
 /* Desktop: add spacing above the custom button row */
 .custom-button-row {
@@ -111,12 +111,7 @@
     align-items: center;
   }
 
-  .donation-box img {
-    max-width: 125px !important;
-    max-height: 125px !important;
-    width: 125px !important;
-    height: 125px !important;
-  }
+  /* Removed fixed image sizing to allow progressive sizing */
 
   .donation-custom img {
     scale: .8;

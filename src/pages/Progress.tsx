@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
-import amountImg from '../assets/amount.png';
-import homeImg from '../assets/home.png';
+import amountImg from '../assets/moneyGIF-bw.gif';
+import homeImg from '../assets/homeGIF-bw.gif';
 import './Progress.css';
 
 function formatDisplayDate(isoString: string | null): string {

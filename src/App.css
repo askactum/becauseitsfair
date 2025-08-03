@@ -67,7 +67,7 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  width: 100%;
+  width: 200px;
   height: 100vh;
   box-sizing: border-box;
   position: relative;
@@ -114,10 +114,11 @@ html, body {
 
 /* --- SIDEBAR NAVIGATION --- */
 .sidebar-nav {
-  width: 100%;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  width: 100%;
+  padding-top: 5rem;
 }
 .sidebar-link-block {
   width: 100%;
@@ -132,11 +133,13 @@ html, body {
   text-align: center;
   margin: 0.6rem 0;
   display: block;
+  width: 100%;
   text-decoration: none;
   font-weight: 400;
   letter-spacing: 0.01em;
   transition: color 0.2s;
   position: relative;
+  align-items: flex-start;
 }
 .sidebar-link.main-link.active {
   position: relative;
@@ -157,7 +160,7 @@ html, body {
 }
 .sidebar-link.main-link:hover {
   color: #0e1a2a;
-  text-decoration: underline;
+  background-color: #f0f0f0; /* Slight background color change */
 }
 
 /* --- SIDEBAR LOGO --- */
@@ -237,7 +240,7 @@ html, body {
   font-size: 1.14rem;
   max-width: 700px;
   margin-bottom: 2.5rem;
-  text-align: center;
+  text-align: justify;
   color: #222;
   font-family: 'Georgia', serif;
 }
@@ -347,7 +350,7 @@ html, body {
     left: 0;
     top: 0;
     height: 100vh;
-    width: 250px;
+    width: 200px;
     background: #fff;
     box-shadow: 2px 0 5px rgba(0,0,0,0.08);
     z-index: 1000;
@@ -355,8 +358,8 @@ html, body {
   .sidebar.always-visible {
     position: fixed;
     top: 0;
-    left: -250px;
-    width: 250px;
+    left: -200px;
+    width: 200px;
     height: 100vh;
     box-shadow: 2px 0 5px rgba(0,0,0,0.08);
     background: #fff;
@@ -392,12 +395,13 @@ html, body {
     font-family: 'Georgia', serif;
     font-size: 1.3rem;
     text-transform: lowercase;
-    text-align: center;
+    text-align: left;
     margin: 1.1rem 0;
     display: block;
     text-decoration: none;
     font-weight: 400;
     letter-spacing: 0.01em;
+    align-items: flex-start;
   }
   .sidebar-socials.bottom {
     padding-left: 0;
@@ -578,9 +582,9 @@ html, body {
 
 @media (min-width: 900px) {
   .center-mission {
-    margin-left: 250px;
-    width: calc(100vw - 250px);
-    max-width: calc(100vw - 250px);
+    margin-left: 200px;
+    width: calc(100vw - 200px);
+    max-width: calc(100vw - 200px);
     padding-right: 0;
   }
 }
@@ -596,7 +600,7 @@ html, body {
     left: 0;
     top: 0;
     height: 100vh;
-    width: 250px;
+    width: 200px;
     background: #fff;
     box-shadow: 2px 0 5px rgba(0,0,0,0.08);
     z-index: 1000;
@@ -614,8 +618,8 @@ html, body {
     padding: 0 0 2rem 0;
   }
   .content-area.with-sidebar {
-    margin-left: 250px;
-    width: calc(100vw - 250px);
+    margin-left: 200px;
+    width: calc(100vw - 200px);
   }
   .main-content {
     display: flex;
@@ -762,12 +766,11 @@ html, body {
 }
 .team-member-bio-truncate {
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 9;
   -webkit-box-orient: vertical;
-  line-clamp: 3;
+  line-clamp: 5;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-height: 4.8em;
   position: relative;
   background: transparent;
   padding-right: 1.2em;
@@ -1040,7 +1043,7 @@ team-member-photo {
   font-size: 1.35rem;
   max-width: 700px;
   margin-bottom: 2.5rem;
-  text-align: center;
+  text-align: justify;
   color: #222;
   font-family: 'Georgia', serif;
 }
@@ -1193,7 +1196,7 @@ team-member-photo {
   transform: scale(1.07) translateY(-4px);
 }
 .floating-shop {
-  left: 270px;
+  left: 220px;
   bottom: 20px;
 }
 .floating-donate {

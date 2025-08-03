@@ -85,7 +85,7 @@ export default function Team() {
                 );
               })()}
               <div className="team-member-bio team-member-bio-truncate">
-                {member.bio.split(/(?<=[.!?])\s+/).slice(0, 3).join(' ')}
+                {member.bio.split(/(?<=[.!?])\s+/).slice(0, 10).join(' ')}
               </div>
             </div>
           </div>

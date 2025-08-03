@@ -1,0 +1,59 @@
+.lab-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    width: 100%;
+    background: #fff;
+    padding: 2rem;
+}
+
+.lab-logo {
+    width: 140px;
+    height: 200px;
+    margin-bottom: 2.5rem;
+    border-radius: 20px;
+}
+
+.lab-title {
+    color: #1a2342;
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    font-family: Georgia, serif;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+
+.lab-description {
+    color: #555;
+    font-size: 1.4rem;
+    line-height: 1.7;
+    margin-bottom: 3rem;
+    font-family: Georgia, serif;
+    text-align: center;
+    max-width: 700px;
+}
+
+.lab-button {
+    background: #fff;
+    color: #000000;
+    border: 2px solid #000000;
+    border-radius: 12px;
+    padding: 1.2rem 2.8rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    font-family: Georgia, serif;
+    letter-spacing: 0.5px;
+    transition: background-color 0.3s ease;
+    outline: none;
+}
+
+.lab-button:hover {
+    background-color: #000000;
+    color: #fff;
+}
