@@ -302,11 +302,39 @@
   background-color: #f0f0f0;
 }
 
+
 /* Header */
 .lab-header {
   display: flex;
   align-items: center;
   margin-bottom: 18px;
+}
+
+/* Top Bar for search and create post */
+.lab-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  gap: 1rem;
+}
+.lab-search-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.lab-search-input {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1.5px solid #444;
+  font-size: 1rem;
+  background: #222;
+  color: #fff;
+  min-width: 180px;
+}
+.lab-create-button-top {
+  margin-bottom: 0;
+  margin-left: auto;
 }
 
 .lab-header-icon {
@@ -325,11 +353,13 @@
   letter-spacing: 0.01em;
 }
 
-.lab-description {
-  font-size: 1.18rem;
-  color: #eee;
-  margin-bottom: 24px;
-  max-width: 1200px;
+.labratory-description {
+    color: #ffffff;
+    font-size: 1.4rem;
+    line-height: 1.7;
+    margin-bottom: 3rem;
+    font-family: Georgia, serif;
+    text-align: justify;
 }
 
 /* Buttons */

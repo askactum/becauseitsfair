@@ -638,13 +638,22 @@ export default function Laboratory() {
     );
   };
 
+
+  // Search/filter state
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchUser, setSearchUser] = useState('');
+
   // Sort posts by votes descending
   const sortedPosts = [...posts].sort((a, b) => (b.votes || 0) - (a.votes || 0));
 
-  // Filter posts by selected category
+  // Filter posts by selected category, search term, and user
   const filteredPosts = sortedPosts.filter(post => {
     const cat = categories.find(c => c.label === selectedCategory);
-    return cat && post.category_id === cat.id;
+    if (!cat || post.category_id !== cat.id) return false;
+    const author = profiles.find(p => p.id === post.user_id);
+    const matchesTitle = post.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesUser = !searchUser || (author && author.username.toLowerCase().includes(searchUser.toLowerCase()));
+    return matchesTitle && matchesUser;
   });
 
   // Get current category
@@ -739,26 +748,47 @@ export default function Laboratory() {
         </div>
       </aside>
 
+
       {/* Main Content */}
       <main className="lab-main-content-area">
         <div className="lab-header">
           <CategoryIcon category={currentCategory} />
           <h1 className="lab-header-title">{selectedCategory}</h1>
         </div>
-        
+
         {currentCategory && (
-          <div className="lab-description">
+          <div className="labratory-description">
             {currentCategory.description || ''}
           </div>
         )}
-        
-        <button 
-          className="lab-create-button"
-          onClick={handleCreatePost}
-        >
-          + Create Post
-        </button>
-        
+
+        {/* Top Bar: Search/Filter and Create Post */}
+        <div className="lab-top-bar">
+          <div className="lab-search-group">
+            <input
+              type="text"
+              className="lab-search-input"
+              placeholder="Search posts..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+            />
+            <input
+              type="text"
+              className="lab-search-input"
+              placeholder="Filter by user..."
+              value={searchUser}
+              onChange={e => setSearchUser(e.target.value)}
+              style={{ marginLeft: 8 }}
+            />
+          </div>
+          <button
+            className="lab-create-button lab-create-button-top"
+            onClick={handleCreatePost}
+          >
+            + Create Post
+          </button>
+        </div>
+
         {createError && (
           <div className="lab-error lab-error-margin">{createError}</div>
         )}
