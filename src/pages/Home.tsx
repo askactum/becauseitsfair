@@ -1,6 +1,9 @@
 export default function Home() {
   return (
     <main className="main-content" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'inherit', paddingTop: '3vh' }}>
+      <head>
+        <meta name="keywords" content="Universal Housing, ACTUM, LA Housing, Free Housing, Because Its Fair, becauseitsfair, lahousing, unviersalhousing" />
+      </head>
       <div className="home-content" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
         <div className="main-title" style={{ fontSize: '3.2rem', fontWeight: 500, marginBottom: '2.2rem', textAlign: 'center' }}>
           welcome to actum.
