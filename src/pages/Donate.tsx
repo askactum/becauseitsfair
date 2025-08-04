@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import './Donate.css';
 import house5Img from '../assets/Donate/house-5.png';
 import house20Img from '../assets/Donate/house-20.png';
@@ -49,18 +49,6 @@ const BUTTONS = [
   },
 ];
 
-// Button size configurations
-const BUTTON_SIZES = {
-  small: 100,
-  medium: 140,
-  large: 180,
-  xlarge: 220,
-  xxlarge: 200
-};
-
-// Current button size - can be changed to any of the above
-const BUTTON_SIZE = BUTTON_SIZES.large;
-
 // Image size configurations (for PayPal button images)
 const IMAGE_SIZES = {
   small: 100,
@@ -70,63 +58,8 @@ const IMAGE_SIZES = {
   xxlarge: 250
 };
 
-// Current image size
-const IMAGE_SIZE = IMAGE_SIZES.large;
-
-// Extracted style objects for reuse
-const buttonContainerStyle: React.CSSProperties = {
-  background: '#fff',
-  padding: '0.8rem',
-  margin: '0 1.2rem',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: BUTTON_SIZE,
-  height: BUTTON_SIZE,
-  boxSizing: 'border-box',
-  position: 'relative',
-  borderRadius: '12px',
-  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-  transition: 'all 0.3s ease',
-};
-
-const buttonInnerStyle: React.CSSProperties = {
-  minHeight: IMAGE_SIZE * 0.3,
-  width: IMAGE_SIZE,
-  height: IMAGE_SIZE,
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  margin: '0 auto',
-  objectFit: 'contain',
-};
 
 const Donate: React.FC = () => {
-  // One ref per button
-  const buttonRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-  // Responsive sizing based on screen width
-  const getResponsiveButtonSize = () => {
-    if (typeof window !== 'undefined') {
-      if (window.innerWidth <= 600) return BUTTON_SIZES.small;
-      if (window.innerWidth <= 900) return BUTTON_SIZES.medium;
-      if (window.innerWidth <= 1200) return BUTTON_SIZES.large;
-      return BUTTON_SIZES.xlarge;
-    }
-    return BUTTON_SIZES.large;
-  };
-
-  const getResponsiveImageSize = () => {
-    if (typeof window !== 'undefined') {
-      if (window.innerWidth <= 600) return IMAGE_SIZES.small;
-      if (window.innerWidth <= 900) return IMAGE_SIZES.medium;
-      if (window.innerWidth <= 1200) return IMAGE_SIZES.large;
-      return IMAGE_SIZES.xlarge;
-    }
-    return IMAGE_SIZES.large;
-  };
-
   // No longer need PayPal SDK since we're using custom buttons
   useEffect(() => {
     // Clean up any existing PayPal scripts
@@ -146,7 +79,7 @@ const Donate: React.FC = () => {
       </div>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
         <div className="donation-box" style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center', gap: '3.5rem', background: 'none', boxShadow: 'none', padding: 0, borderRadius: 0, marginBottom: 0, zIndex: 1 }}>
-          {BUTTONS.filter(btn => !btn.isCustom).map((btn, idx) => (
+          {BUTTONS.filter(btn => !btn.isCustom).map((btn) => ( // Removed `idx`
             <img 
               key={btn.id}
               src={btn.image} 
