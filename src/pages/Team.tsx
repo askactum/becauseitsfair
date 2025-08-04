@@ -50,7 +50,7 @@ export default function Team() {
       <div className="team-intro-text" style={{
         maxWidth: '700px',
         margin: '2.5rem auto',
-        textAlign: 'center',
+        textAlign: 'justify',
         fontSize: '1.35rem',
         fontFamily: 'Georgia, serif',
         lineHeight: 1.5

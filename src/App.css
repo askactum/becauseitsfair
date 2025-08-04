@@ -766,7 +766,7 @@ html, body {
 }
 .team-member-bio-truncate {
   display: -webkit-box;
-  -webkit-line-clamp: 9;
+  -webkit-line-clamp: 5;
   -webkit-box-orient: vertical;
   line-clamp: 5;
   overflow: hidden;
