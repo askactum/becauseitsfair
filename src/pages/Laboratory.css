@@ -1,3 +1,9 @@
+/* Comment icon button hover effect for Laboratory page *
+/* Highlight comment icon button red on hover */
+
+.lab-comment-icon-btn:hover .lab-comment-icon {
+  color: #ca0c0c !important;
+}
 /* Laboratory Page Styles */
 
 .lab-main-layout {
@@ -174,7 +180,7 @@
 }
 
 .lab-right-sidebar {
-  width: 320px;
+  width: 250px;
   background: rgba(0, 0, 0, 0.85);
   padding: 2.2rem 1.2rem 1.2rem 1.2rem;
   border-left: 2px solid #222;
@@ -192,6 +198,9 @@
   min-width: 0;
   position: relative;
   overflow-x: auto;
+  max-width: 1080px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Logo and Branding */
@@ -424,12 +433,12 @@
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.13);
   padding: 1.5rem 1.5rem 1.2rem 1.5rem;
   color: #fff;
+  font-family: system-ui, "Segoe UI", Arial, sans-serif;
 }
 
 .lab-post-header {
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
   gap: 10px;
   justify-content: space-between;
 }
@@ -484,16 +493,17 @@
 }
 
 .lab-vote-button.voted {
-  color: #ffd700;
+  color: #ff0000;
 }
 
 .lab-post-title {
   font-weight: 700;
   font-size: 2rem;
-  margin: 0 0 0.7rem 0;
+  margin: 0 0 0rem 0;
   color: #fff;
   cursor: pointer;
-  text-decoration: underline;
+  text-decoration: none;
+  font-family: inherit;
 }
 
 .lab-post-content {
@@ -501,13 +511,11 @@
   color: #ccc;
   margin-bottom: 12px;
   cursor: pointer;
+  font-family: inherit;
 }
 
 .lab-post-comments-preview {
-  background: #18171c;
-  border-radius: 8px;
-  padding: 1rem;
-  margin-top: 10px;
+  display: none;
 }
 
 .lab-comment-item {

@@ -3,9 +3,12 @@ import { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import CountryFlag from 'react-country-flag';
 import { getData, Country } from 'country-list';
+import { useEffect } from 'react';
+import { getBrowserCountryCode } from '../utils/getBrowserCountry';
 
 // Replace hardcoded countryFlags with dynamic list
 const countryFlags: { code: string; name: string }[] = getData().map((c: Country) => ({ code: c.code, name: c.name }));
+
 
 export default function LabAuthModal({ open, onOpenChange, onAuthSuccess }: {
   open: boolean;
@@ -17,8 +20,28 @@ export default function LabAuthModal({ open, onOpenChange, onAuthSuccess }: {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [countryFlag, setCountryFlag] = useState(countryFlags[0].code);
+  const [countryList, setCountryList] = useState(countryFlags);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // On mount, detect browser country and set as top and selected
+  useEffect(() => {
+    if (mode !== 'signup') return;
+    const browserCountry = getBrowserCountryCode();
+    if (browserCountry) {
+      // Find the country in the list
+      const idx = countryFlags.findIndex(f => f.code === browserCountry);
+      if (idx !== -1) {
+        setCountryFlag(browserCountry);
+        // Move to top
+        setCountryList([countryFlags[idx], ...countryFlags.filter((_, i) => i !== idx)]);
+      } else {
+        setCountryList(countryFlags);
+      }
+    } else {
+      setCountryList(countryFlags);
+    }
+  }, [mode]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -119,48 +142,12 @@ export default function LabAuthModal({ open, onOpenChange, onAuthSuccess }: {
           flexDirection: 'column',
           alignItems: 'center',
         }}>
-          <Dialog.Title style={{ fontSize: '2rem', fontWeight: 700, marginBottom: 18 }}>
+          <Dialog.Title style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: 14, letterSpacing: '-0.5px', color: '#f5f5f7', lineHeight: 1.2 }}>
             {mode === 'login' ? 'Log In' : 'Sign Up'}
           </Dialog.Title>
           <form onSubmit={handleSubmit} style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 16 }}>
             {mode === 'signup' && (
               <>
-                <input
-                  type="text"
-                  placeholder="Username"
-                  value={username}
-                  onChange={e => setUsername(e.target.value)}
-                  required
-                  style={{
-                    padding: '0.7rem 1rem',
-                    borderRadius: 8,
-                    border: '1.5px solid #444',
-                    fontSize: 16,
-                    background: '#222',
-                    color: '#fff',
-                    marginBottom: 8,
-                  }}
-                />
-                <select
-                  value={countryFlag}
-                  onChange={e => setCountryFlag(e.target.value)}
-                  required
-                  style={{
-                    padding: '0.7rem 1rem',
-                    borderRadius: 8,
-                    border: '1.5px solid #444',
-                    fontSize: 16,
-                    background: '#222',
-                    color: '#fff',
-                    marginBottom: 8,
-                  }}
-                >
-                  {countryFlags.map((flag: { code: string; name: string }) => (
-                    <option key={flag.code} value={flag.code}>
-                      <CountryFlag countryCode={flag.code} svg style={{ width: 20, height: 20, marginRight: 8, borderRadius: '50%' }} title={flag.code} /> {flag.name}
-                    </option>
-                  ))}
-                </select>
                 <input
                   type="email"
                   placeholder="Email"
@@ -178,6 +165,26 @@ export default function LabAuthModal({ open, onOpenChange, onAuthSuccess }: {
                   }}
                 />
                 <input
+                  type="text"
+                  placeholder="Username"
+                  value={username}
+                  onChange={e => setUsername(e.target.value)}
+                  required
+                  style={{
+                    width: '100%',
+                    boxSizing: 'border-box',
+                    padding: '0.7rem 1rem',
+                    borderRadius: 8,
+                    border: '1.5px solid #444',
+                    fontSize: 16,
+                    background: '#222',
+                    color: '#fff',
+                    marginBottom: 8,
+                  }}
+                />
+                
+                
+                <input
                   type="password"
                   placeholder="Password"
                   value={password}
@@ -193,6 +200,34 @@ export default function LabAuthModal({ open, onOpenChange, onAuthSuccess }: {
                     marginBottom: 8,
                   }}
                 />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <CountryFlag
+                    countryCode={countryFlag}
+                    svg
+                    style={{ width: 40, height: 40 }}
+                    title={countryFlag}
+                  />
+                    <select
+                    value={countryFlag}
+                    onChange={e => setCountryFlag(e.target.value)}
+                    required
+                    style={{
+                      background: '#222',
+                      color: '#fff',
+                      border: '1.5px solid #444',
+                      borderRadius: 8,
+                      fontSize: 16,
+                      padding: '0.5rem 1rem',
+                      minWidth: 120,
+                    }}
+                    >
+                    {countryList.map((flag: { code: string; name: string }) => (
+                      <option key={flag.code} value={flag.code}>
+                      {flag.name}
+                      </option>
+                    ))}
+                    </select>
+                </div>
               </>
             )}
             {mode === 'login' && (
@@ -251,16 +286,16 @@ export default function LabAuthModal({ open, onOpenChange, onAuthSuccess }: {
               {loading ? (mode === 'login' ? 'Logging in...' : 'Signing up...') : (mode === 'login' ? 'Log In' : 'Sign Up')}
             </button>
           </form>
-          <div style={{ marginTop: 10, fontSize: 15, color: '#aaa' }}>
+          <div style={{ marginTop: 8, fontSize: 13, color: '#b3b3b3', fontWeight: 400, letterSpacing: '-0.1px', display: 'flex', alignItems: 'center', gap: 4 }}>
             {mode === 'login' ? (
               <>
-                Don&apos;t have an account?{' '}
-                <button onClick={() => setMode('signup')} style={{ color: '#fff', background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer', fontWeight: 700 }}>Sign Up</button>
+                <span>Don&apos;t have an account?</span>
+                <button onClick={() => setMode('signup')} style={{ color: '#5e5eff', background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer', fontWeight: 500, fontSize: 13, padding: 0 }}>Sign Up</button>
               </>
             ) : (
               <>
-                Already have an account?{' '}
-                <button onClick={() => setMode('login')} style={{ color: '#fff', background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer', fontWeight: 700 }}>Log In</button>
+                <span>Already have an account?</span>
+                <button onClick={() => setMode('login')} style={{ color: '#5e5eff', background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer', fontWeight: 500, fontSize: 13, padding: 0 }}>Log In</button>
               </>
             )}
           </div>

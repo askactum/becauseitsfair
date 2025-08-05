@@ -1,4 +1,26 @@
+// Helper to format time ago (Reddit style)
+function timeAgo(dateString: string): string {
+  const now = new Date();
+  const date = new Date(dateString);
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  if (isNaN(seconds)) return '';
+  if (seconds < 60) return `· just now`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `· ${minutes} min ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `· ${hours} hour${hours === 1 ? '' : 's'} ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `· ${days} day${days === 1 ? '' : 's'} ago`;
+  const months = Math.floor(days / 30);
+  if (months < 12) return `· ${months} month${months === 1 ? '' : 's'} ago`;
+  const years = Math.floor(months / 12);
+  return `· ${years} year${years === 1 ? '' : 's'} ago`;
+}
 import { useState, useEffect } from 'react';
+import { BiUpvote } from 'react-icons/bi';
+import { MdOutlineDelete } from 'react-icons/md';
+import { FaRegComments } from 'react-icons/fa';
+import { IoArrowBackOutline } from "react-icons/io5";
 import './Laboratory.css';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
@@ -19,6 +41,7 @@ import volunteerslogo from '../assets/lab_logos/volunteerslogo.png';
 import medialogo from '../assets/lab_logos/medialogo.png';
 import ethicslogo from '../assets/lab_logos/ethicslogo.png';
 import storieslogo from '../assets/lab_logos/storieslogo.png';
+import homelogo from '../assets/lab_logos/homelogo.png';
 import ActumOfficialLogo from '../assets/ACTUM_white.png';
 
 // Category logos mapping
@@ -34,6 +57,7 @@ const categoryLogos: Record<string, string> = {
   media: medialogo,
   ethics: ethicslogo,
   stories: storieslogo,
+  home: homelogo,
 };
 
 // Types for better type safety
@@ -110,19 +134,28 @@ export default function Laboratory() {
   const [createError, setCreateError] = useState<string | null>(null);
   const [newPostCategoryId, setNewPostCategoryId] = useState<number | null>(null);
   
-  // Post detail modal
-  const [postModalOpen, setPostModalOpen] = useState(false);
+  // Post detail view (in place)
   const [activePost, setActivePost] = useState<Post | null>(null);
-  const [modalPage, setModalPage] = useState(1);
-  const COMMENTS_PER_PAGE = 10;
+  // const [detailPage, setDetailPage] = useState(1); // Removed unused state
+  // Comment pagination state
+  const INITIAL_COMMENTS_COUNT = 5;
+  const LOAD_MORE_COMMENTS_COUNT = 20;
+  const [visibleCommentsCount, setVisibleCommentsCount] = useState(INITIAL_COMMENTS_COUNT);
   const [newComment, setNewComment] = useState('');
   const [commentLoading, setCommentLoading] = useState(false);
   const [commentError, setCommentError] = useState<string | null>(null);
   
   // Voting state
   const [userPostVotes, setUserPostVotes] = useState<number[]>([]);
+  // Track loading state for post upvotes to prevent double clicks
+  const [postVoteLoading, setPostVoteLoading] = useState<{ [postId: number]: boolean }>({});
+  // Track loading state for comment upvotes to prevent double clicks
+  const [commentVoteLoading, setCommentVoteLoading] = useState<{ [commentId: number]: boolean }>({});
   const [userCommentVotes, setUserCommentVotes] = useState<number[]>([]);
   const [userPromptCommentVotes, setUserPromptCommentVotes] = useState<number[]>([]);
+
+  // Comment sort option for post detail view
+  const [commentSortOption, setCommentSortOption] = useState<'mostVoted' | 'newest'>('mostVoted');
 
   // Monthly prompt state
   const [monthlyPrompt, setMonthlyPrompt] = useState<MonthlyPrompt | null>(null);
@@ -141,6 +174,7 @@ export default function Laboratory() {
     supabase
       .from('categories')
       .select('*')
+      .order('id', { ascending: true })
       .then(({ data, error }) => {
         if (error) {
           console.error('Error fetching categories:', error);
@@ -337,7 +371,9 @@ export default function Laboratory() {
 
   const handleOpenPost = (post: Post) => {
     setActivePost(post);
-    setPostModalOpen(true);
+    setNewComment('');
+    setCommentError(null);
+    setVisibleCommentsCount(INITIAL_COMMENTS_COUNT);
   };
 
   const handleCommentOnPost = (post: Post) => {
@@ -346,7 +382,6 @@ export default function Laboratory() {
       return;
     }
     setActivePost(post);
-    setPostModalOpen(true);
   };
 
   // Voting handlers
@@ -355,21 +390,39 @@ export default function Laboratory() {
       setAuthModalOpen(true);
       return;
     }
-    
-    if (userPostVotes.includes(postId)) {
-      // Remove vote
-      await supabase.from('post_votes').delete().eq('user_id', user.id).eq('post_id', postId);
-      await supabase.rpc('decrement_post_votes', { postid: postId });
-      setUserPostVotes(userPostVotes.filter(id => id !== postId));
-    } else {
-      // Add vote
-      const { error } = await supabase.from('post_votes').insert({ user_id: user.id, post_id: postId });
-      if (!error) {
-        await supabase.rpc('increment_post_votes', { postid: postId });
-        setUserPostVotes([...userPostVotes, postId]);
+    // Prevent double click
+    if (postVoteLoading[postId]) return;
+    setPostVoteLoading(prev => ({ ...prev, [postId]: true }));
+    try {
+      // Optimistically update local vote count for instant UI feedback
+      setPosts(prevPosts => prevPosts.map(post => {
+        if (post.id !== postId) return post;
+        if (userPostVotes.includes(postId)) {
+          // Remove vote locally
+          return { ...post, votes: (post.votes || 0) - 1 };
+        } else {
+          // Add vote locally
+          return { ...post, votes: (post.votes || 0) + 1 };
+        }
+      }));
+      if (userPostVotes.includes(postId)) {
+        // Remove vote
+        await supabase.from('post_votes').delete().eq('user_id', user.id).eq('post_id', postId);
+        await supabase.rpc('decrement_post_votes', { postid: postId });
+        setUserPostVotes(userPostVotes.filter(id => id !== postId));
+      } else {
+        // Add vote
+        const { error } = await supabase.from('post_votes').insert({ user_id: user.id, post_id: postId });
+        if (!error) {
+          await supabase.rpc('increment_post_votes', { postid: postId });
+          setUserPostVotes([...userPostVotes, postId]);
+        }
       }
+      // Optionally, you can still refresh posts from backend for consistency
+      // await refreshPosts();
+    } finally {
+      setPostVoteLoading(prev => ({ ...prev, [postId]: false }));
     }
-    refreshPosts();
   };
 
   const handleUpvoteComment = async (commentId: number) => {
@@ -377,21 +430,26 @@ export default function Laboratory() {
       setAuthModalOpen(true);
       return;
     }
-    
-    if (userCommentVotes.includes(commentId)) {
-      // Remove vote
-      await supabase.from('comment_votes').delete().eq('user_id', user.id).eq('comment_id', commentId);
-      await supabase.rpc('decrement_comment_votes', { commentid: commentId });
-      setUserCommentVotes(userCommentVotes.filter(id => id !== commentId));
-    } else {
-      // Add vote
-      const { error } = await supabase.from('comment_votes').insert({ user_id: user.id, comment_id: commentId });
-      if (!error) {
-        await supabase.rpc('increment_comment_votes', { commentid: commentId });
-        setUserCommentVotes([...userCommentVotes, commentId]);
+    if (commentVoteLoading[commentId]) return;
+    setCommentVoteLoading(prev => ({ ...prev, [commentId]: true }));
+    try {
+      if (userCommentVotes.includes(commentId)) {
+        // Remove vote
+        await supabase.from('comment_votes').delete().eq('user_id', user.id).eq('comment_id', commentId);
+        await supabase.rpc('decrement_comment_votes', { commentid: commentId });
+        setUserCommentVotes(userCommentVotes.filter(id => id !== commentId));
+      } else {
+        // Add vote
+        const { error } = await supabase.from('comment_votes').insert({ user_id: user.id, comment_id: commentId });
+        if (!error) {
+          await supabase.rpc('increment_comment_votes', { commentid: commentId });
+          setUserCommentVotes([...userCommentVotes, commentId]);
+        }
       }
+      refreshComments();
+    } finally {
+      setCommentVoteLoading(prev => ({ ...prev, [commentId]: false }));
     }
-    refreshComments();
   };
 
   const handleUpvotePromptComment = async (commentId: number) => {
@@ -641,23 +699,86 @@ export default function Laboratory() {
 
   // Search/filter state
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchUser, setSearchUser] = useState('');
+  // Global search bar state
+  const [globalSearch, setGlobalSearch] = useState('');
+  // Track previous category for reverting when search is cleared
+  const [prevCategory, setPrevCategory] = useState<string | null>(null);
 
-  // Sort posts by votes descending
-  const sortedPosts = [...posts].sort((a, b) => (b.votes || 0) - (a.votes || 0));
+  // Sort option state
+  const [sortOption, setSortOption] = useState<'mostVoted' | 'newest' | 'mostComments'>('mostVoted');
 
-  // Filter posts by selected category, search term, and user
-  const filteredPosts = sortedPosts.filter(post => {
-    const cat = categories.find(c => c.label === selectedCategory);
-    if (!cat || post.category_id !== cat.id) return false;
-    const author = profiles.find(p => p.id === post.user_id);
-    const matchesTitle = post.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesUser = !searchUser || (author && author.username.toLowerCase().includes(searchUser.toLowerCase()));
-    return matchesTitle && matchesUser;
+  // Filter posts by global search or selected category, search term, and user
+  // Find the Home category (was 'Search')
+  const homeCategory = categories.find(c => c.label.toLowerCase() === 'home');
+
+  // Auto-switch to Home tab when global search is typed in
+  useEffect(() => {
+    if (!homeCategory) return;
+    if (globalSearch.trim() !== '' && selectedCategory !== homeCategory.label) {
+      setPrevCategory(selectedCategory);
+      setSelectedCategory(homeCategory.label);
+    } else if (globalSearch.trim() === '' && selectedCategory === homeCategory.label && prevCategory) {
+      setSelectedCategory(prevCategory);
+      setPrevCategory(null);
+    }
+  }, [globalSearch, homeCategory, selectedCategory, prevCategory]);
+
+  let filteredPosts = posts.filter(post => {
+    // If 'Home' category is selected, show all posts (optionally filter by global search)
+    if (selectedCategory && homeCategory && selectedCategory === homeCategory.label) {
+      if (globalSearch.trim() !== '') {
+        const author = profiles.find(p => p.id === post.user_id);
+        const cat = categories.find(c => c.id === post.category_id);
+        const matchesTitle = post.title.toLowerCase().includes(globalSearch.toLowerCase());
+        const matchesContent = (post.content || '').toLowerCase().includes(globalSearch.toLowerCase());
+        const matchesUser = author && author.username.toLowerCase().includes(globalSearch.toLowerCase());
+        const matchesCategory = cat && cat.label.toLowerCase().includes(globalSearch.toLowerCase());
+        return matchesTitle || matchesContent || matchesUser || matchesCategory;
+      }
+      return true; // Show all posts if no search
+    }
+    // If global search is active, search all posts in all communities
+    if (globalSearch.trim() !== '') {
+      const author = profiles.find(p => p.id === post.user_id);
+      const cat = categories.find(c => c.id === post.category_id);
+      const matchesTitle = post.title.toLowerCase().includes(globalSearch.toLowerCase());
+      const matchesContent = (post.content || '').toLowerCase().includes(globalSearch.toLowerCase());
+      const matchesUser = author && author.username.toLowerCase().includes(globalSearch.toLowerCase());
+      const matchesCategory = cat && cat.label.toLowerCase().includes(globalSearch.toLowerCase());
+      return matchesTitle || matchesContent || matchesUser || matchesCategory;
+    } else {
+      const cat = categories.find(c => c.label === selectedCategory);
+      if (!cat || post.category_id !== cat.id) return false;
+      const matchesTitle = post.title.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesContent = (post.content || '').toLowerCase().includes(searchTerm.toLowerCase());
+      return searchTerm.trim() === '' || matchesTitle || matchesContent;
+    }
+  });
+
+  // Sort posts by selected sort option
+  filteredPosts = [...filteredPosts].sort((a, b) => {
+    if (sortOption === 'mostVoted') {
+      return (b.votes || 0) - (a.votes || 0);
+    } else if (sortOption === 'newest') {
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    } else if (sortOption === 'mostComments') {
+      // Sort by number of comments (descending)
+      const aComments = comments.filter(c => c.post_id === a.id).length;
+      const bComments = comments.filter(c => c.post_id === b.id).length;
+      return bComments - aComments;
+    }
+    return 0;
   });
 
   // Get current category
   const currentCategory = categories.find(c => c.label === selectedCategory);
+
+  // Set Home as default selected category on load
+  useEffect(() => {
+    if (categories.length > 0 && selectedCategory === '' && homeCategory) {
+      setSelectedCategory(homeCategory.label);
+    }
+  }, [categories, selectedCategory, homeCategory]);
 
   return (
     <div 
@@ -699,22 +820,55 @@ export default function Laboratory() {
             <div className="lab-loading lab-loading-nav">Loading...</div>
           ) : (
             categories.map(cat => (
-              <div 
-                key={cat.id} 
-                className={`lab-nav-item ${selectedCategory === cat.label ? 'selected' : ''}`}
-                style={{ color: selectedCategory === cat.label ? cat.color : '#fff' }}
-                onClick={() => setSelectedCategory(cat.label)}
+              <div
+                key={cat.id}
+                className={`lab-nav-item reddit-style-nav ${selectedCategory === cat.label ? 'selected' : ''}`}
+                style={{
+                  color: selectedCategory === cat.label ? cat.color : '#fff',
+                  borderRadius: '1rem',
+                  marginBottom: 4,
+                  cursor: 'pointer',
+                  padding: '0.25rem 0.7rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  fontWeight: 500,
+                  fontSize: 13,
+                  transition: 'color 0.15s, border-bottom 0.2s',
+                  outlineOffset: -1,
+                  border: 'none',
+                  borderBottom: selectedCategory === cat.label ? `3px solid ${cat.color}` : '3px solid transparent',
+                  minHeight: 44,
+                  boxShadow: 'none',
+                  background: 'transparent',
+                  filter: 'none',
+                }}
+                onClick={() => {
+                  setSelectedCategory(cat.label);
+                  if (activePost) setActivePost(null);
+                }}
+                tabIndex={0}
               >
-                {categoryLogos[cat.label.toLowerCase()] ? (
-                  <img 
-                    src={categoryLogos[cat.label.toLowerCase()]} 
-                    alt={cat.label} 
-                    className="lab-nav-icon"
-                  />
-                ) : (
-                  <span className="lab-nav-icon">{cat.icon}</span>
-                )}
-                {cat.label}
+                <span style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '100%',
+                  marginRight: 0,
+                  flexShrink: 0,
+                  overflow: 'hidden',
+                }}>
+                  {categoryLogos[cat.label.toLowerCase()] ? (
+                    <img
+                      src={categoryLogos[cat.label.toLowerCase()]}
+                      alt={cat.label}
+                      style={{ width: '3rem', height: '3rem', objectFit: 'contain', borderRadius: '100%' }}
+                    />
+                  ) : (
+                    <span style={{ fontSize: 28, color: cat.color }}>{cat.icon}</span>
+                  )}
+                </span>
+                <span style={{ fontSize: 13, fontWeight: 400, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginLeft: 0 }}>{cat.label}</span>
               </div>
             ))
           )}
@@ -751,43 +905,179 @@ export default function Laboratory() {
 
       {/* Main Content */}
       <main className="lab-main-content-area">
-        <div className="lab-header">
-          <CategoryIcon category={currentCategory} />
-          <h1 className="lab-header-title">{selectedCategory}</h1>
+        {/* Global Search Bar */}
+        <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '2.2rem 0 1.2rem 0' }}>
+          <input
+            type="text"
+            value={globalSearch}
+            onChange={e => setGlobalSearch(e.target.value)}
+            placeholder="Search all posts and communities..."
+            style={{
+              width: 'min(600px, 90vw)',
+              fontSize: 22,
+              padding: '1.1rem 2.2rem',
+              borderRadius: 18,
+              border: '1.5px solid #333',
+              background: '#19191f',
+              color: '#fff',
+              fontWeight: 500,
+              boxShadow: '0 2px 16px 0 rgba(0,0,0,0.08)',
+              outline: 'none',
+              margin: 0,
+              transition: 'border 0.2s, box-shadow 0.2s',
+            }}
+            onFocus={e => (e.currentTarget.style.border = '2px solid #5e5eff')}
+            onBlur={e => (e.currentTarget.style.border = '1.5px solid #333')}
+            aria-label="Global search posts"
+          />
         </div>
 
-        {currentCategory && (
+        <div className="lab-header">
+          {homeCategory && selectedCategory === homeCategory.label ? (
+            <h1 className="lab-header-title" style={{ letterSpacing: '0.01em', fontWeight: 700, fontSize: 32, color: '#fff' }}>THE LAB</h1>
+          ) : (
+            <>
+              <CategoryIcon category={currentCategory} />
+              <h1 className="lab-header-title">{selectedCategory}</h1>
+            </>
+          )}
+        </div>
+
+        {/* Show description always on Home, and on other categories as before */}
+        {((homeCategory && selectedCategory === homeCategory.label) || (currentCategory && (!homeCategory || selectedCategory !== homeCategory.label))) && (
           <div className="labratory-description">
-            {currentCategory.description || ''}
+            {homeCategory && selectedCategory === homeCategory.label
+              ? (homeCategory.description || '')
+              : (currentCategory?.description || '')}
           </div>
         )}
 
-        {/* Top Bar: Search/Filter and Create Post */}
-        <div className="lab-top-bar">
-          <div className="lab-search-group">
+        {/* Top Bar: Search/Filter, Sort, and Create Post (only for non-Home categories) */}
+        {currentCategory && (!homeCategory || selectedCategory !== homeCategory.label) && (
+          <div className="lab-top-bar" style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginTop: 12 }}>
+            {/* Community-limited search bar (styled like global, but only searches this community) */}
             <input
               type="text"
-              className="lab-search-input"
-              placeholder="Search posts..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
+              placeholder={`Search ${selectedCategory}...`}
+              style={{
+                width: 'min(400px, 90vw)',
+                fontSize: 18,
+                padding: '0.7rem 1.5rem',
+                borderRadius: 14,
+                border: '1.5px solid #333',
+                background: '#19191f',
+                color: '#fff',
+                fontWeight: 500,
+                boxShadow: '0 2px 12px 0 rgba(0,0,0,0.07)',
+                outline: 'none',
+                margin: 0,
+                transition: 'border 0.2s, box-shadow 0.2s',
+              }}
+              onFocus={e => (e.currentTarget.style.border = '2px solid #5e5eff')}
+              onBlur={e => (e.currentTarget.style.border = '1.5px solid #333')}
+              aria-label={`Search ${selectedCategory}`}
             />
-            <input
-              type="text"
-              className="lab-search-input"
-              placeholder="Filter by user..."
-              value={searchUser}
-              onChange={e => setSearchUser(e.target.value)}
-              style={{ marginLeft: 8 }}
-            />
+            <div style={{ position: 'relative' }}>
+              <select
+                value={sortOption}
+                onChange={e => setSortOption(e.target.value as 'mostVoted' | 'newest' | 'mostComments')}
+                className="custom-select"
+                style={{
+                  padding: '6px 28px 6px 12px',
+                  fontSize: 14,
+                  color: '#fff',
+                  backgroundColor: '#1A1A1A',
+                  border: 'none',
+                  borderRadius: 16,
+                  appearance: 'none',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'none',
+                  cursor: 'pointer',
+                  fontWeight: 500,
+                }}
+                aria-label="Sort posts"
+              >
+                <option value="mostVoted">Most Voted</option>
+                <option value="mostComments">Most Comments</option>
+                <option value="newest">Recent</option>
+              </select>
+              {/* Dropdown arrow icon */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="#ccc"
+                viewBox="0 0 24 24"
+                style={{
+                  position: 'absolute',
+                  right: 8,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  pointerEvents: 'none',
+                }}
+              >
+                <path d="M7 10l5 5 5-5z" />
+              </svg>
+            </div>
+            <button
+              className="lab-create-button lab-create-button-top"
+              onClick={handleCreatePost}
+            >
+              + Create Post
+            </button>
           </div>
-          <button
-            className="lab-create-button lab-create-button-top"
-            onClick={handleCreatePost}
-          >
-            + Create Post
-          </button>
-        </div>
+        )}
+
+        {/* Show sort bar on Home page (like comment sort) */}
+        {homeCategory && selectedCategory === homeCategory.label && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, margin: '0 0 18px 0' }}>
+            <span style={{ color: '#b3b3b3', fontSize: 14, fontWeight: 500 }}>Sort by:</span>
+            <div style={{ position: 'relative' }}>
+              <select
+                value={sortOption}
+                onChange={e => setSortOption(e.target.value as 'mostVoted' | 'newest' | 'mostComments')}
+                className="custom-select"
+                style={{
+                  padding: '6px 28px 6px 12px',
+                  fontSize: 14,
+                  color: '#fff',
+                  backgroundColor: '#1A1A1A',
+                  border: 'none',
+                  borderRadius: 16,
+                  appearance: 'none',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'none',
+                  cursor: 'pointer',
+                  fontWeight: 500,
+                }}
+                aria-label="Sort posts"
+              >
+                <option value="mostVoted">Most Voted</option>
+                <option value="newest">Recent</option>
+                <option value="mostComments">Most Comments</option>
+              </select>
+              {/* Dropdown arrow icon */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="#ccc"
+                viewBox="0 0 24 24"
+                style={{
+                  position: 'absolute',
+                  right: 8,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  pointerEvents: 'none',
+                }}
+              >
+                <path d="M7 10l5 5 5-5z" />
+              </svg>
+            </div>
+          </div>
+        )}
 
         {createError && (
           <div className="lab-error lab-error-margin">{createError}</div>
@@ -869,102 +1159,371 @@ export default function Laboratory() {
           </Dialog.Portal>
         </Dialog.Root>
 
-        {/* Post Feed */}
-        {postsLoading ? (
-          <div className="lab-loading">Loading posts...</div>
-        ) : (
-          filteredPosts.map(post => {
+        {/* Post Feed or Post Detail */}
+        {activePost ? (
+          (() => {
+            // Always use the latest post object from posts state for up-to-date votes
+            const post = posts.find(p => p.id === activePost.id) || activePost;
             const author = profiles.find(p => p.id === post.user_id);
-            const postComments = comments
-              .filter(c => c.post_id === post.id)
-              .sort((a, b) => (b.votes || 0) - (a.votes || 0))
-              .slice(0, 3);
-            
+            const cat = categories.find(c => c.id === post.category_id);
+
+            // Get and sort comments for this post
+            let postCommentsRaw = comments.filter(c => c.post_id === post.id);
+            postCommentsRaw = [...postCommentsRaw].sort((a, b) => {
+              if (commentSortOption === 'mostVoted') {
+                return (b.votes || 0) - (a.votes || 0);
+              } else if (commentSortOption === 'newest') {
+                return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+              }
+              return 0;
+            });
+            const postComments = postCommentsRaw.slice(0, visibleCommentsCount);
+            const hasMoreComments = visibleCommentsCount < postCommentsRaw.length;
             return (
-              <div key={post.id} className="lab-post-card">
-                <div className="lab-post-header">
-                  <div className="lab-post-author">
+              <div className="lab-post-card lab-post-detail">
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 18, justifyContent: 'space-between' }}>
+                  <button
+                    onClick={() => setActivePost(null)}
+                    className="lab-button-small"
+                    style={{ display: 'flex', alignItems: 'center' }}
+                  >
+                    <IoArrowBackOutline style={{ marginRight: 6 }} /> Back to Posts
+                  </button>
+                  {/* Category on far right */}
+                  <div style={{ display: 'flex', alignItems: 'center', marginLeft: 16 }}>
+                    {cat && categoryLogos[cat.label.toLowerCase()] ? (
+                      <img 
+                        src={categoryLogos[cat.label.toLowerCase()]} 
+                        alt={cat.label} 
+                        style={{ width: 28, height: 28, marginRight: 8, objectFit: 'contain' }}
+                      />
+                    ) : (
+                      <span style={{ fontSize: 22, marginRight: 8 }}>{cat?.icon || ''}</span>
+                    )}
+                    <span style={{ color: '#aaa', fontSize: 15, fontWeight: 600 }}>
+                      {cat?.label || ''}
+                    </span>
+                  </div>
+                </div>
+                <div className="lab-post-header" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginBottom: 8 }}>
+                  <div className="lab-post-author" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <UserFlag profile={author} />
                     <span className="lab-post-author-name">
                       {author?.username || 'Anon'}
                     </span>
-                  </div>
-                  <div className="lab-post-votes">
-                    <span className="lab-post-vote-count">
-                      {post.votes?.toLocaleString?.() || 0}
+                    <span style={{ color: '#aaa', fontSize: 13, marginLeft: 2 }}>
+                      {timeAgo(post.created_at)}
                     </span>
-                    <button
-                      onClick={() => handleUpvotePost(post.id)}
-                      disabled={!user}
-                      className={`lab-vote-button ${userPostVotes.includes(post.id) ? 'voted' : ''}`}
-                      title={userPostVotes.includes(post.id) ? 'Remove upvote' : 'Upvote'}
-                    >
-                      ▲
-                    </button>
                   </div>
                 </div>
-                
+                <h2 className="lab-post-title" style={{ textDecoration: 'none', cursor: 'default' }}>
+                  {post.title}
+                </h2>
+                <div 
+                  className="lab-post-content" 
+                  style={{ cursor: 'default', whiteSpace: 'pre-line' }}
+                  dangerouslySetInnerHTML={{ __html: (post.content || '').replace(/\n/g, '<br />') }} 
+                />
+                {/* Upvote and Comment controls under post content */}
+                <div style={{ display: 'flex', alignItems: 'center', marginTop: 18, marginBottom: 18, gap: 12 }}>
+                  {/* Upvote/Downvote */}
+                  <div style={{ display: 'flex', alignItems: 'center', background: '#f5f6f7', borderRadius: 20, padding: '2px 10px', gap: 2 }}>
+                    <button
+                      onClick={() => handleUpvotePost(post.id)}
+                      disabled={!user || postVoteLoading[post.id]}
+                      className={`lab-vote-button ${userPostVotes.includes(post.id) ? 'voted' : ''}`}
+                      title={userPostVotes.includes(post.id) ? 'Remove upvote' : 'Upvote'}
+                      style={{ color: userPostVotes.includes(post.id) ? '#ff4500' : '#878a8c', background: 'none', border: 'none', fontSize: 22, padding: 0, margin: 0, cursor: postVoteLoading[post.id] ? 'not-allowed' : 'pointer', opacity: postVoteLoading[post.id] ? 0.6 : 1 }}
+                    >
+                      <BiUpvote />
+                    </button>
+                    <span style={{ color: '#222', fontWeight: 700, fontSize: 15, minWidth: 18, textAlign: 'center' }}>
+                      {post.votes?.toLocaleString?.() || 0}
+                    </span>
+                  </div>
+                  {/* Comment Button (icon only, not clickable in detail view) */}
+                  <div style={{ display: 'flex', alignItems: 'center', background: '#f5f6f7', border: 'none', borderRadius: 20, padding: '2px 14px', color: '#222', fontWeight: 600, fontSize: 15, gap: 6 }}>
+                    <span style={{ display: 'flex', alignItems: 'center', color: '#878a8c', fontSize: 18, marginRight: 2 }}>
+                      <FaRegComments />
+                    </span>
+                    <span>{comments.filter(c => c.post_id === activePost.id).length}</span>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14, margin: '1.2rem 0 0.7rem 0' }}>
+                  <span style={{ fontWeight: 700, color: '#fff', fontSize: 18 }}>Comments</span>
+                </div>
+                {/* Comment Form */}
+                {user && profile ? (
+                  <form onSubmit={handleSubmitComment} className="lab-form-row" style={{ marginBottom: 8, alignItems: 'flex-end' }}>
+                    <textarea
+                      placeholder="Add a comment..."
+                      value={newComment}
+                      onChange={e => setNewComment(e.target.value)}
+                      required
+                      className="lab-input lab-input-regular"
+                      style={{ flex: 1, minHeight: 38, maxHeight: 120, resize: 'vertical', fontSize: 14, padding: '8px 12px', borderRadius: 12, border: 'none', background: '#23232a', color: '#fff', fontWeight: 400 }}
+                      rows={1}
+                    />
+                    <button 
+                      type="submit" 
+                      disabled={commentLoading}
+                      className="lab-primary-button lab-button-medium"
+                      style={{ marginLeft: 8 }}
+                    >
+                      {commentLoading ? 'Posting...' : 'Post'}
+                    </button>
+                  </form>
+                ) : (
+                  <div style={{ color: '#aaa', marginBottom: 8 }}>
+                    Log in to comment.
+                  </div>
+                )}
+                {/* Comment Sort Dropdown - Reddit style, left-aligned, inline label */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, margin: '0 0 10px 0' }}>
+                  <span style={{ color: '#b3b3b3', fontSize: 14, fontWeight: 500 }}>Sort by:</span>
+                  <div style={{ position: 'relative' }}>
+                    <select
+                      value={commentSortOption}
+                      onChange={e => setCommentSortOption(e.target.value as 'mostVoted' | 'newest')}
+                      className="custom-select"
+                      style={{
+                        padding: '6px 28px 6px 12px',
+                        fontSize: 14,
+                        color: '#fff',
+                        backgroundColor: '#1A1A1A',
+                        border: 'none',
+                        borderRadius: 16,
+                        appearance: 'none',
+                        WebkitAppearance: 'none',
+                        MozAppearance: 'none',
+                        cursor: 'pointer',
+                        fontWeight: 500,
+                      }}
+                      aria-label="Sort comments"
+                    >
+                      <option value="mostVoted">Best</option>
+                      <option value="newest">Newest</option>
+                    </select>
+                    {/* Dropdown arrow icon */}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="#ccc"
+                      viewBox="0 0 24 24"
+                      style={{
+                        position: 'absolute',
+                        right: 8,
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        pointerEvents: 'none',
+                      }}
+                    >
+                      <path d="M7 10l5 5 5-5z" />
+                    </svg>
+                  </div>
+                </div>
+                {commentError && (
+                  <div className="lab-error" style={{ marginBottom: 8 }}>
+                    {commentError}
+                  </div>
+                )}
+                {/* Comments List */}
+                <div style={{ width: '100%', maxHeight: 400, overflowY: 'auto', marginBottom: 18 }}>
+                  {postComments.map(c => {
+                    const commenter = profiles.find(p => p.id === c.user_id);
+                    return (
+                      <div key={c.id} className="lab-comment-item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+                            <div className="lab-comment-author" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <UserFlag profile={commenter} />
+                              <span className="lab-comment-author-name">
+                                {commenter?.username || 'Anon'}
+                              </span>
+                              <span style={{ color: '#aaa', fontSize: 13, marginLeft: 2 }}>{timeAgo(c.created_at)}</span>
+                            </div>
+                            <div className="lab-comment-text" style={{ margin: '2px 0 0 0', wordBreak: 'break-word', whiteSpace: 'pre-line' }}>{c.content}</div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 0, marginTop: 6, marginBottom: 2 }}>
+                              <button
+                                onClick={() => handleUpvoteComment(c.id)}
+                                disabled={!user || commentVoteLoading?.[c.id]}
+                                className={`lab-vote-button ${userCommentVotes.includes(c.id) ? 'voted' : ''}`}
+                                title={userCommentVotes.includes(c.id) ? 'Remove upvote' : 'Upvote'}
+                                style={{ color: userCommentVotes.includes(c.id) ? '#ff4500' : '#878a8c', background: 'none', border: 'none', fontSize: 20, padding: 0, margin: 0, cursor: commentVoteLoading?.[c.id] ? 'not-allowed' : 'pointer', opacity: commentVoteLoading?.[c.id] ? 0.6 : 1, lineHeight: 1 }}
+                              >
+                                <BiUpvote />
+                              </button>
+                              <span style={{ color: '#fefefe', fontWeight: 700, fontSize: 12, minWidth: 18, textAlign: 'center', lineHeight: 1, marginLeft: 2, marginRight: 6 }}>
+                                {c.votes?.toLocaleString?.() || 0}
+                              </span>
+                              {(commenter?.id === user?.id || profile?.is_admin) && (
+                                <button
+                                  onClick={() => handleDeleteComment(c.id)}
+                                  className="lab-delete-icon-btn"
+                                  style={{
+                                    marginLeft: 1,
+                                    background: 'none',
+                                    border: 'none',
+                                    padding: 0,
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    color: '#b0b0b0',
+                                    fontSize: 20,
+                                    transition: 'color 0.15s',
+                                    outline: 'none',
+                                  }}
+                                  title="Delete comment"
+                                  type="button"
+                                  onMouseOver={e => (e.currentTarget.style.color = '#e53935')}
+                                  onMouseOut={e => (e.currentTarget.style.color = '#b0b0b0')}
+                                  onFocus={e => (e.currentTarget.style.outline = 'none')}
+                                >
+                                  <MdOutlineDelete />
+                                </button>
+                              )}
+                            </div>
+                            {/* Thin line after each comment */}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {hasMoreComments && (
+                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: 10 }}>
+                      <button
+                        onClick={() => setVisibleCommentsCount(c => c + LOAD_MORE_COMMENTS_COUNT)}
+                        className="lab-secondary-button"
+                        style={{ padding: '0.5rem 1.2rem', borderRadius: 8, fontSize: 15, fontWeight: 500 }}
+                      >
+                        Load more comments
+                      </button>
+                    </div>
+                  )}
+                </div>
+                {/* Pagination removed, replaced by Load More */}
+              </div>
+            );
+          })()
+        ) : postsLoading ? (
+          <div className="lab-loading">Loading posts...</div>
+        ) : (
+          filteredPosts.map(post => {
+            const author = profiles.find(p => p.id === post.user_id);
+            // const postComments = comments
+            //   .filter(c => c.post_id === post.id)
+            //   .sort((a, b) => (b.votes || 0) - (a.votes || 0))
+            //   .slice(0, 3); // Removed unused variable
+            // Show community on right if in Home category
+            const showCommunity = homeCategory && selectedCategory === homeCategory.label;
+            const postCat = categories.find(c => c.id === post.category_id);
+            return (
+              <div key={post.id} className="lab-post-card">
+                <div className="lab-post-header">
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: showCommunity ? 'space-between' : 'flex-start', width: '100%' }}>
+                    <div className="lab-post-author" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <UserFlag profile={author} />
+                      <span className="lab-post-author-name">
+                        {author?.username || 'Anon'}
+                      </span>
+                      <span style={{ color: '#aaa', fontSize: 13, marginLeft: 2 }}>{timeAgo(post.created_at)}</span>
+                    </div>
+                    {showCommunity && postCat && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        {categoryLogos[postCat.label.toLowerCase()] ? (
+                          <img
+                            src={categoryLogos[postCat.label.toLowerCase()]}
+                            alt={postCat.label}
+                            style={{ width: 22, height: 22, objectFit: 'contain', borderRadius: '100%' }}
+                          />
+                        ) : (
+                          <span style={{ fontSize: 18, color: postCat.color }}>{postCat.icon}</span>
+                        )}
+                        <span style={{ color: postCat.color, fontWeight: 600, fontSize: 14 }}>{postCat.label}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
                 <h2 
                   className="lab-post-title"
                   onClick={() => handleOpenPost(post)}
                 >
                   {post.title}
                 </h2>
-                
                 <div
                   className="lab-post-content"
-                  dangerouslySetInnerHTML={{ __html: post.content }}
+                  style={{ whiteSpace: 'pre-line' }}
+                  dangerouslySetInnerHTML={{ __html: (post.content || '').replace(/\n/g, '<br />') }}
                   onClick={() => handleOpenPost(post)}
                 />
-                
-                {/* Comments Preview */}
-                <div className="lab-post-comments-preview">
-                  {postComments.map(c => {
-                    const commenter = profiles.find(p => p.id === c.user_id);
-                    return (
-                      <div key={c.id} className="lab-comment-item">
-                        <div className="lab-comment-author">
-                          <UserFlag profile={commenter} />
-                          <span className="lab-comment-author-name">
-                            {commenter?.username || 'Anon'}
-                          </span>:
-                          <span>{c.content}</span>
-                        </div>
-                        <div className="lab-comment-votes">
-                          <span className="lab-comment-vote-count">
-                            {c.votes?.toLocaleString?.() || 0}
-                          </span>
-                          <button
-                            onClick={() => handleUpvoteComment(c.id)}
-                            disabled={!user}
-                            className={`lab-comment-vote-button ${userCommentVotes.includes(c.id) ? 'voted' : ''}`}
-                            title={userCommentVotes.includes(c.id) ? 'Remove upvote' : 'Upvote'}
-                          >
-                            ▲
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
+                <div style={{ display: 'flex', alignItems: 'center', marginTop: 10, gap: 12 }}>
+                  {/* Upvote/Downvote */}
+                  <div style={{ display: 'flex', alignItems: 'center', background: '#f5f6f7', borderRadius: 20, padding: '2px 10px', gap: 2 }}>
+                    <button
+                      onClick={() => handleUpvotePost(post.id)}
+                      disabled={!user || postVoteLoading[post.id]}
+                      className={`lab-vote-button ${userPostVotes.includes(post.id) ? 'voted' : ''}`}
+                      title={userPostVotes.includes(post.id) ? 'Remove upvote' : 'Upvote'}
+                      style={{ color: userPostVotes.includes(post.id) ? '#ff4500' : '#878a8c', background: 'none', border: 'none', fontSize: 22, padding: 0, margin: 0, cursor: postVoteLoading[post.id] ? 'not-allowed' : 'pointer', opacity: postVoteLoading[post.id] ? 0.6 : 1 }}
+                    >
+                      <BiUpvote />
+                    </button>
+                    <span style={{ color: '#222', fontWeight: 700, fontSize: 15, minWidth: 18, textAlign: 'center' }}>
+                      {post.votes?.toLocaleString?.() || 0}
+                    </span>
+                  </div>
+                  {/* Comment Button (icon only clickable, hover for filled icon) */}
+                  <div style={{ display: 'flex', alignItems: 'center', background: '#f5f6f7', border: 'none', borderRadius: 20, padding: '2px 14px', color: '#222', fontWeight: 600, fontSize: 15, gap: 6 }}>
+                    <button
+                      onClick={() => handleCommentOnPost(post)}
+                      className="lab-comment-icon-btn"
+                      style={{ display: 'flex', alignItems: 'center', background: 'none', border: 'none', padding: 0, margin: 0, color: 'inherit', cursor: 'pointer' }}
+                      title="Comment"
+                      type="button"
+                      onFocus={e => (e.currentTarget.style.outline = 'none')} 
+                    >
+                      <FaRegComments className="lab-comment-icon" 
+                      style={
+                        { fontSize: 18, marginRight: 2, position: 'absolute', pointerEvents: 'none' }} 
+                        onFocus={e => (e.currentTarget.style.outline = 'none')} />
+                      <span style={{ opacity: 0, width: 18, height: 18, display: 'inline-block' }}></span>
+                    </button>
+                    <span>{comments.filter(c => c.post_id === post.id).length}</span>
+                  </div>
+                  {/* Delete Button (if author) */}
+                  {author?.id === user?.id && (
+                    <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+                      <button
+                        onClick={() => {
+                          if (window.confirm('Are you sure you want to delete this post?')) handleDeletePost(post.id);
+                        }}
+                        className="lab-delete-icon-btn"
+                        style={{
+                          marginLeft: 12,
+                          background: 'none',
+                          border: 'none',
+                          padding: 0,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          color: '#b0b0b0',
+                          fontSize: 22,
+                          transition: 'color 0.15s',
+                          outline: 'none',
+                        }}
+                        title="Delete post"
+                        type="button"
+                        onMouseOver={e => (e.currentTarget.style.color = '#e53935')}
+                        onMouseOut={e => (e.currentTarget.style.color = '#b0b0b0')}
+                        onFocus={e => (e.currentTarget.style.outline = 'none')}
+                      >
+                        <MdOutlineDelete />
+                      </button>
+                    </div>
+                  )}
                 </div>
-                
-                <button
-                  className="lab-primary-button lab-button-medium"
-                  onClick={() => handleCommentOnPost(post)}
-                  style={{ marginTop: 10 }}
-                >
-                  Add Comment
-                </button>
-                
-                {author?.id === user?.id && (
-                  <button
-                    onClick={() => handleDeletePost(post.id)}
-                    className="lab-secondary-button lab-button-small"
-                    style={{ marginLeft: 12 }}
-                  >
-                    Delete
-                  </button>
-                )}
               </div>
             );
           })
@@ -1095,189 +1654,7 @@ export default function Laboratory() {
         </div>
       </aside>
 
-      {/* Post Detail Modal */}
-      <Dialog.Root 
-        open={postModalOpen} 
-        onOpenChange={open => { 
-          setPostModalOpen(open); 
-          if (!open) { 
-            setActivePost(null); 
-            setModalPage(1); 
-            setNewComment(''); 
-            setCommentError(null); 
-          } 
-        }}
-      >
-        <Dialog.Portal>
-          <Dialog.Overlay className="lab-modal-overlay" />
-          <Dialog.Content className="lab-modal-content">
-            {activePost && (() => {
-              const author = profiles.find(p => p.id === activePost.user_id);
-              const cat = categories.find(c => c.id === activePost.category_id);
-              const postComments = comments
-                .filter(c => c.post_id === activePost.id)
-                .sort((a, b) => (b.votes || 0) - (a.votes || 0))
-                .slice((modalPage - 1) * COMMENTS_PER_PAGE, modalPage * COMMENTS_PER_PAGE);
-              
-              return (
-                <>
-                  {/* Post Header */}
-                  <div className="lab-post-header">
-                    <div className="lab-post-author">
-                      <UserFlag profile={author} />
-                      <span className="lab-post-author-name">
-                        {author?.username || 'Anon'}
-                      </span>
-                    </div>
-                    <div className="lab-post-votes">
-                      <span className="lab-post-vote-count">
-                        {activePost.votes?.toLocaleString?.() || 0}
-                      </span>
-                      <button
-                        onClick={() => handleUpvotePost(activePost.id)}
-                        disabled={!user}
-                        className={`lab-vote-button ${userPostVotes.includes(activePost.id) ? 'voted' : ''}`}
-                        title={userPostVotes.includes(activePost.id) ? 'Remove upvote' : 'Upvote'}
-                      >
-                        ▲
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Category Info */}
-                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
-                    {cat && categoryLogos[cat.label.toLowerCase()] ? (
-                      <img 
-                        src={categoryLogos[cat.label.toLowerCase()]} 
-                        alt={cat.label} 
-                        style={{ width: 32, height: 32, marginRight: 10, objectFit: 'contain' }}
-                      />
-                    ) : (
-                      <span style={{ fontSize: 28, marginRight: 10 }}>{cat?.icon || ''}</span>
-                    )}
-                    <span style={{ color: cat?.color || '#aaa', fontSize: 16 }}>
-                      {cat?.label || ''}
-                    </span>
-                  </div>
-
-                  {/* Post Content */}
-                  <h2 className="lab-post-title" style={{ textDecoration: 'none', cursor: 'default' }}>
-                    {activePost.title}
-                  </h2>
-                  
-                  <div 
-                    className="lab-post-content" 
-                    style={{ cursor: 'default' }}
-                    dangerouslySetInnerHTML={{ __html: activePost.content }} 
-                  />
-
-                  <div style={{ fontWeight: 700, color: '#fff', margin: '1.2rem 0 0.7rem 0', fontSize: 18 }}>
-                    Comments
-                  </div>
-
-                  {/* Comment Form */}
-                  {user && profile ? (
-                    <form onSubmit={handleSubmitComment} className="lab-form-row" style={{ marginBottom: 18 }}>
-                      <input
-                        type="text"
-                        placeholder="Add a comment..."
-                        value={newComment}
-                        onChange={e => setNewComment(e.target.value)}
-                        required
-                        className="lab-input lab-input-regular"
-                        style={{ flex: 1 }}
-                      />
-                      <button 
-                        type="submit" 
-                        disabled={commentLoading}
-                        className="lab-primary-button lab-button-medium"
-                      >
-                        {commentLoading ? 'Posting...' : 'Post'}
-                      </button>
-                    </form>
-                  ) : (
-                    <div style={{ color: '#aaa', marginBottom: 18 }}>
-                      Log in to comment.
-                    </div>
-                  )}
-
-                  {commentError && (
-                    <div className="lab-error" style={{ marginBottom: 8 }}>
-                      {commentError}
-                    </div>
-                  )}
-
-                  {/* Comments List */}
-                  <div style={{ width: '100%', maxHeight: 400, overflowY: 'auto', marginBottom: 18 }}>
-                    {postComments.map(c => {
-                      const commenter = profiles.find(p => p.id === c.user_id);
-                      return (
-                        <div key={c.id} className="lab-comment-item">
-                          <div className="lab-comment-author">
-                            <UserFlag profile={commenter} />
-                            <span className="lab-comment-author-name">
-                              {commenter?.username || 'Anon'}
-                            </span>:
-                            <span>{c.content}</span>
-                          </div>
-                          <div className="lab-comment-votes">
-                            <span className="lab-comment-vote-count">
-                              {c.votes?.toLocaleString?.() || 0}
-                            </span>
-                            <button
-                              onClick={() => handleUpvoteComment(c.id)}
-                              disabled={!user}
-                              className={`lab-comment-vote-button ${userCommentVotes.includes(c.id) ? 'voted' : ''}`}
-                              title={userCommentVotes.includes(c.id) ? 'Remove upvote' : 'Upvote'}
-                            >
-                              ▲
-                            </button>
-                          </div>
-                          {(commenter?.id === user?.id || profile?.is_admin) && (
-                            <button
-                              onClick={() => handleDeleteComment(c.id)}
-                              className="lab-secondary-button"
-                              style={{ 
-                                marginLeft: 8, 
-                                padding: '0.2rem 0.7rem', 
-                                fontSize: 13 
-                              }}
-                            >
-                              Delete
-                            </button>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Pagination */}
-                  <div className="lab-pagination">
-                    <button
-                      onClick={() => setModalPage(p => Math.max(1, p - 1))}
-                      disabled={modalPage === 1}
-                      className="lab-pagination-button"
-                    >
-                      Previous
-                    </button>
-                    <button
-                      onClick={() => setModalPage(p => p + 1)}
-                      disabled={comments.filter(c => c.post_id === activePost.id).length <= modalPage * COMMENTS_PER_PAGE}
-                      className="lab-pagination-button"
-                    >
-                      Next
-                    </button>
-                  </div>
-                </>
-              );
-            })()}
-            
-            <Dialog.Close asChild>
-              <button className="lab-modal-close" aria-label="Close">×</button>
-            </Dialog.Close>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      {/* Post Detail Modal removed, now handled in main content */}
     </div>
   );
 }   
