@@ -97,19 +97,89 @@ html, body {
   background: #222;
   color: #fff;
   font-size: 1.45rem;
+  transition: background 0.2s, transform 0.4s;
   width: 38px;
   height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 4px;
-  transition: background 0.2s;
   margin: 0;
   box-shadow: none;
   border: none;
 }
 .sidebar-socials.bottom .icon:hover {
-  background: #444;
+  background: #ff2a2a;
+  transform: scale(1.1);
+}
+
+.sidebar-socials.bottom .icon.youtube:hover {
+  background: #FF0000;
+  transform: scale(1.1);
+}
+
+.sidebar-socials.bottom .icon.instagram:hover {
+  background: #E4405F;
+  transform: scale(1.1);
+}
+
+.sidebar-socials.bottom .icon.facebook:hover {
+  background: #1877F2;
+  transform: scale(1.1);
+}
+
+.sidebar-socials.bottom .icon.tiktok:hover {
+  background: #000000;
+  transform: scale(1.1);
+}
+
+.sidebar-socials.bottom .icon.x:hover {
+  background: #000000;
+  transform: scale(1.1);
+}
+
+.sidebar-socials.bottom .icon.twitch:hover {
+  background: #9146FF;
+  transform: scale(1.1);
+}
+
+/* Contact Page Social Icons */
+.contact-social-icon {
+  background: #222;
+  color: #fff;
+  font-size: 1.45rem;
+  transition: background 0.2s, transform 0.4s;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  margin: 0;
+  box-shadow: none;
+  border: none;
+}
+.contact-social-icon:hover {
+  background: #ff2a2a;
+  transform: scale(1.1);
+}
+.contact-social-icon.youtube:hover {
+  background: #FF0000;
+}
+.contact-social-icon.instagram:hover {
+  background: #E4405F;
+}
+.contact-social-icon.facebook:hover {
+  background: #1877F2;
+}
+.contact-social-icon.tiktok:hover {
+  background: #000000;
+}
+.contact-social-icon.x:hover {
+  background: #000000;
+}
+.contact-social-icon.twitch:hover {
+  background: #9146FF;
 }
 
 /* --- SIDEBAR NAVIGATION --- */
@@ -160,7 +230,26 @@ html, body {
 }
 .sidebar-link.main-link:hover {
   color: #0e1a2a;
-  background-color: #f0f0f0; /* Slight background color change */
+  position: relative;
+}
+.sidebar-link.main-link:hover::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -2px;
+  height: 3px;
+  background: #2d4c8d;
+  width: 0;
+  transform: translateX(-50%);
+  animation: drawLine .7s forwards;
+}
+@keyframes drawLine {
+  from { 
+    width: 0;
+  }
+  to { 
+    width: 100%;
+  }
 }
 
 /* --- SIDEBAR LOGO --- */
@@ -415,6 +504,7 @@ html, body {
     height: 32px;
     border-radius: 3px;
   }
+
   .logo-block {
     align-items: center;
     margin-bottom: 1.2rem;
@@ -721,7 +811,7 @@ html, body {
   background: #fff;
   border-radius: 6px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-  width: 260px;
+  width: 100%;
   min-width: 220px;
   max-width: 320px;
   display: flex;
@@ -729,6 +819,7 @@ html, body {
   align-items: center;
   overflow: hidden;
   margin-bottom: 2rem;
+  flex: 1 1 auto;
 }
 .team-section-title {
   color: #fff;
@@ -738,7 +829,7 @@ html, body {
 }
 .team-member-photo {
   width: 100%;
-  height: 260px;
+  aspect-ratio: 1/1;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -774,6 +865,7 @@ html, body {
   position: relative;
   background: transparent;
   padding-right: 1.2em;
+  min-height: 7.5em; /* Approximate height for 5 lines */
 }
 .bio-expand-btn {
   background: none;
@@ -892,7 +984,7 @@ html, body {
   color: #222;
   font-family: 'Georgia', serif;
   line-height: 1.7;
-  text-align: left;
+  text-align: justify;
   white-space: pre-line;
 }
 .team-member-title-job {
@@ -957,12 +1049,11 @@ html, body {
 
   .team-member-photo {
     width: 100%;
-    height: 300px;
+    aspect-ratio: 1/1;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     border-bottom: 1px solid #eee;
-    object-fit: cover;
   }
 }
 

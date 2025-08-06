@@ -53,30 +53,13 @@ export default function Contact() {
         justifyItems: 'center',
         alignItems: 'center',
       }}>
-        <a href="https://www.youtube.com/@becauseitsfair" target="_blank" rel="noopener noreferrer" title="YouTube" style={iconStyle}><FaYoutube /></a>
-        <a href="https://www.instagram.com/becauseitsfair/" target="_blank" rel="noopener noreferrer" title="Instagram" style={iconStyle}><FaInstagram /></a>
-        <a href="https://www.facebook.com/becauseitsfair/" target="_blank" rel="noopener noreferrer" title="Facebook" style={iconStyle}><FaFacebook /></a>
-        <a href="https://www.tiktok.com/@becauseitsfair" target="_blank" rel="noopener noreferrer" title="TikTok" style={iconStyle}><FaTiktok /></a>
-        <a href="https://x.com/becauseitsfair" target="_blank" rel="noopener noreferrer" title="X" style={iconStyle}><FaXTwitter /></a>
-        <a href="https://www.twitch.tv/universalhousing" target="_blank" rel="noopener noreferrer" title="Twitch" style={iconStyle}><FaTwitch /></a>
+        <a href="https://www.youtube.com/@becauseitsfair" target="_blank" rel="noopener noreferrer" title="YouTube" className="contact-social-icon youtube"><FaYoutube /></a>
+        <a href="https://www.instagram.com/becauseitsfair/" target="_blank" rel="noopener noreferrer" title="Instagram" className="contact-social-icon instagram"><FaInstagram /></a>
+        <a href="https://www.facebook.com/becauseitsfair/" target="_blank" rel="noopener noreferrer" title="Facebook" className="contact-social-icon facebook"><FaFacebook /></a>
+        <a href="https://www.tiktok.com/@becauseitsfair" target="_blank" rel="noopener noreferrer" title="TikTok" className="contact-social-icon tiktok"><FaTiktok /></a>
+        <a href="https://x.com/becauseitsfair" target="_blank" rel="noopener noreferrer" title="X" className="contact-social-icon x"><FaXTwitter /></a>
+        <a href="https://www.twitch.tv/universalhousing" target="_blank" rel="noopener noreferrer" title="Twitch" className="contact-social-icon twitch"><FaTwitch /></a>
       </div>
     </div>
   );
 }
-
-const iconStyle = {
-  background: '#222',
-  color: '#fff',
-  fontSize: '1.45rem',
-  width: 38,
-  height: 38,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  borderRadius: 4,
-  transition: 'background 0.2s',
-  margin: 0,
-  boxShadow: 'none',
-  border: 'none',
-  textDecoration: 'none',
-};

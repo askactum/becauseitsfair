@@ -245,11 +245,11 @@ function AppLayout() {
               })}
             </nav>
             <div className="sidebar-socials bottom">
-              {socialLinks.map(link => (
-                <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" title={link.label} className="icon">
-                  {link.icon}
-                </a>
-              ))}
+{socialLinks.map(link => (
+  <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" title={link.label} className={`icon ${link.label.toLowerCase()}`}>
+    {link.icon}
+  </a>
+))}
             </div>
           </aside>
         </div>
