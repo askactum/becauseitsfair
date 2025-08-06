@@ -27,7 +27,6 @@ import './Laboratory.css';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import LabAuthModal from './LabAuthModal';
-import CountryFlag from 'react-country-flag';
 import labImg from '../assets/lab_w.png';
 import labBg from '../assets/lab-bg.png';
 import * as Dialog from '@radix-ui/react-dialog';
@@ -628,41 +627,6 @@ export default function Laboratory() {
     setNewComment('');
     refreshComments();
     setCommentLoading(false);
-  const handleSubmitReply = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setReplyLoading(true);
-    setReplyError(null);
-    if (!user || !profile) {
-      setReplyError('You must be logged in to reply.');
-      setReplyLoading(false);
-      setAuthModalOpen(true);
-      return;
-    }
-    if (!replyContent.trim()) {
-      setReplyError('Reply cannot be empty.');
-      setReplyLoading(false);
-      return;
-    }
-    if (!activePost || !replyToCommentId) return;
-    const { error } = await supabase
-      .from('comments')
-      .insert({
-        post_id: activePost.id,
-        user_id: user.id,
-        content: replyContent.trim(),
-        created_at: new Date().toISOString(),
-        parent_comment_id: replyToCommentId
-      });
-    if (error) {
-      setReplyError('Failed to add reply.');
-      setReplyLoading(false);
-      return;
-    }
-    setReplyContent('');
-    setReplyToCommentId(null);
-    refreshComments();
-    setReplyLoading(false);
-  };
   };
 
   const handleAddPromptComment = async (e: React.FormEvent) => {
