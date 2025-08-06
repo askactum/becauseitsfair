@@ -16,11 +16,13 @@ function timeAgo(dateString: string): string {
   const years = Math.floor(months / 12);
   return `· ${years} year${years === 1 ? '' : 's'} ago`;
 }
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BiUpvote } from 'react-icons/bi';
+import { FaChevronRight } from 'react-icons/fa';
 import { MdOutlineDelete } from 'react-icons/md';
 import { FaRegComments } from 'react-icons/fa';
 import { IoArrowBackOutline } from "react-icons/io5";
+import { FiLogOut } from 'react-icons/fi';
 import './Laboratory.css';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
@@ -43,6 +45,7 @@ import ethicslogo from '../assets/lab_logos/ethicslogo.png';
 import storieslogo from '../assets/lab_logos/storieslogo.png';
 import homelogo from '../assets/lab_logos/homelogo.png';
 import ActumOfficialLogo from '../assets/ACTUM_white.png';
+import { CircleFlag } from 'react-circle-flags';
 
 // Category logos mapping
 const categoryLogos: Record<string, string> = {
@@ -112,6 +115,51 @@ interface MonthlyPromptComment {
 }
 
 export default function Laboratory() {
+  const [hasLoaded, setHasLoaded] = useState(false);
+
+  // Reddit-style collapsed state for comment threads (must be top-level for hooks)
+  const [collapsedThreads, setCollapsedThreads] = useState<{[id: number]: boolean}>({});
+  // ...existing code...
+
+  // Threaded comment reply handler
+  const handleSubmitReply = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setReplyLoading(true);
+    setReplyError(null);
+    if (!user || !profile) {
+      setReplyError('You must be logged in to reply.');
+      setReplyLoading(false);
+      setAuthModalOpen(true);
+      return;
+    }
+    if (!replyContent.trim()) {
+      setReplyError('Reply cannot be empty.');
+      setReplyLoading(false);
+      return;
+    }
+    if (!activePost || !replyToCommentId) {
+      setReplyLoading(false);
+      return;
+    }
+    const { error } = await supabase
+      .from('comments')
+      .insert({
+        post_id: activePost.id,
+        user_id: user.id,
+        content: replyContent.trim(),
+        created_at: new Date().toISOString(),
+        parent_comment_id: replyToCommentId
+      });
+    if (error) {
+      setReplyError('Failed to add reply.');
+      setReplyLoading(false);
+      return;
+    }
+    setReplyContent('');
+    setReplyToCommentId(null);
+    refreshComments();
+    setReplyLoading(false);
+  };
   // State management
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -144,6 +192,11 @@ export default function Laboratory() {
   const [newComment, setNewComment] = useState('');
   const [commentLoading, setCommentLoading] = useState(false);
   const [commentError, setCommentError] = useState<string | null>(null);
+  // Threaded comments state
+  const [replyToCommentId, setReplyToCommentId] = useState<number | null>(null);
+  const [replyContent, setReplyContent] = useState('');
+  const [replyLoading, setReplyLoading] = useState(false);
+  const [replyError, setReplyError] = useState<string | null>(null);
   
   // Voting state
   const [userPostVotes, setUserPostVotes] = useState<number[]>([]);
@@ -174,7 +227,7 @@ export default function Laboratory() {
     supabase
       .from('categories')
       .select('*')
-      .order('id', { ascending: true })
+      .order('sort_order', { ascending: true })
       .then(({ data, error }) => {
         if (error) {
           console.error('Error fetching categories:', error);
@@ -546,22 +599,18 @@ export default function Laboratory() {
     e.preventDefault();
     setCommentLoading(true);
     setCommentError(null);
-    
     if (!user || !profile) {
       setCommentError('You must be logged in to comment.');
       setCommentLoading(false);
       setAuthModalOpen(true);
       return;
     }
-    
     if (!newComment.trim()) {
       setCommentError('Comment cannot be empty.');
       setCommentLoading(false);
       return;
     }
-    
     if (!activePost) return;
-    
     const { error } = await supabase
       .from('comments')
       .insert({
@@ -569,17 +618,51 @@ export default function Laboratory() {
         user_id: user.id,
         content: newComment.trim(),
         created_at: new Date().toISOString(),
+        parent_comment_id: null // top-level comment
       });
-      
     if (error) {
       setCommentError('Failed to add comment.');
       setCommentLoading(false);
       return;
     }
-    
     setNewComment('');
     refreshComments();
     setCommentLoading(false);
+  const handleSubmitReply = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setReplyLoading(true);
+    setReplyError(null);
+    if (!user || !profile) {
+      setReplyError('You must be logged in to reply.');
+      setReplyLoading(false);
+      setAuthModalOpen(true);
+      return;
+    }
+    if (!replyContent.trim()) {
+      setReplyError('Reply cannot be empty.');
+      setReplyLoading(false);
+      return;
+    }
+    if (!activePost || !replyToCommentId) return;
+    const { error } = await supabase
+      .from('comments')
+      .insert({
+        post_id: activePost.id,
+        user_id: user.id,
+        content: replyContent.trim(),
+        created_at: new Date().toISOString(),
+        parent_comment_id: replyToCommentId
+      });
+    if (error) {
+      setReplyError('Failed to add reply.');
+      setReplyLoading(false);
+      return;
+    }
+    setReplyContent('');
+    setReplyToCommentId(null);
+    refreshComments();
+    setReplyLoading(false);
+  };
   };
 
   const handleAddPromptComment = async (e: React.FormEvent) => {
@@ -668,16 +751,12 @@ export default function Laboratory() {
   // Helper component to render user flag
   const UserFlag = ({ profile }: { profile?: Profile }) => {
     if (!profile) return null;
-    
-    return profile.country_flag === 'ACTUM' ? (
-      <img src={actumLogo} alt="Actum Logo" className="lab-post-author-flag" />
-    ) : (
-      <CountryFlag 
-        countryCode={profile.country_flag} 
-        svg 
-        className="lab-post-author-flag"
-        title={profile.country_flag} 
-      />
+    if (profile.country_flag === 'ACTUM') {
+      return <img src={actumLogo} alt="Actum Logo" className="lab-post-author-flag" />;
+    }
+    // Use react-circle-flags for country flag
+    return (
+      <CircleFlag countryCode={profile.country_flag?.toLowerCase()} height={24} width={24} style={{ borderRadius: '50%' }} />
     );
   };
 
@@ -780,6 +859,15 @@ export default function Laboratory() {
     }
   }, [categories, selectedCategory, homeCategory]);
 
+  useEffect(() => {
+    // Apply fade-in class on initial load
+    if (!hasLoaded) {
+      const mainContent = document.querySelector('.lab-main-content-area');
+      if (mainContent) {mainContent.classList.add('fade-in');}
+      setHasLoaded(true);
+    }
+  }, [hasLoaded]);
+
   return (
     <div 
       className="lab-layout lab-layout-with-bg"
@@ -819,11 +907,16 @@ export default function Laboratory() {
           {loading ? (
             <div className="lab-loading lab-loading-nav">Loading...</div>
           ) : (
-            categories.map(cat => (
-              <div
-                key={cat.id}
-                className={`lab-nav-item reddit-style-nav ${selectedCategory === cat.label ? 'selected' : ''}`}
-                style={{
+            (() => {
+              // Put Home category first, then the rest
+              const homeCat = categories.find(c => c.label.toLowerCase() === 'home');
+              const otherCats = categories.filter(c => c.label.toLowerCase() !== 'home');
+              const orderedCats = homeCat ? [homeCat, ...otherCats] : categories;
+              return orderedCats.map(cat => (
+                <div
+                  key={cat.id}
+                  className={`lab-nav-item reddit-style-nav ${selectedCategory === cat.label ? 'selected' : ''}`}
+                  style={{
                   color: selectedCategory === cat.label ? cat.color : '#fff',
                   borderRadius: '1rem',
                   marginBottom: 4,
@@ -832,8 +925,8 @@ export default function Laboratory() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.45rem',
-                  fontWeight: 500,
-                  fontSize: 13,
+                  fontWeight: 400,
+                  fontSize: 14, // Increased font size
                   transition: 'color 0.15s, border-bottom 0.2s',
                   outlineOffset: -1,
                   border: 'none',
@@ -842,14 +935,15 @@ export default function Laboratory() {
                   boxShadow: 'none',
                   background: 'transparent',
                   filter: 'none',
-                }}
-                onClick={() => {
+                  fontFamily: "'IBM Plex Sans', 'Arial', 'Helvetica Neue', Arial, sans-serif", // Reddit font
+                  }}
+                  onClick={() => {
                   setSelectedCategory(cat.label);
                   if (activePost) setActivePost(null);
-                }}
-                tabIndex={0}
-              >
-                <span style={{
+                  }}
+                  tabIndex={0}
+                >
+                  <span style={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -857,20 +951,29 @@ export default function Laboratory() {
                   marginRight: 0,
                   flexShrink: 0,
                   overflow: 'hidden',
-                }}>
+                  }}>
                   {categoryLogos[cat.label.toLowerCase()] ? (
                     <img
-                      src={categoryLogos[cat.label.toLowerCase()]}
-                      alt={cat.label}
-                      style={{ width: '3rem', height: '3rem', objectFit: 'contain', borderRadius: '100%' }}
+                    src={categoryLogos[cat.label.toLowerCase()]}
+                    alt={cat.label}
+                    style={{ width: '3rem', height: '3rem', objectFit: 'contain', borderRadius: '100%' }}
                     />
                   ) : (
                     <span style={{ fontSize: 28, color: cat.color }}>{cat.icon}</span>
                   )}
-                </span>
-                <span style={{ fontSize: 13, fontWeight: 400, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginLeft: 0 }}>{cat.label}</span>
-              </div>
-            ))
+                  </span>
+                  <span style={{
+                  fontSize: 18, // Increased font size for label
+                  fontWeight: 400,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  marginLeft: 0,
+                  fontFamily: "'IBM Plex Sans', 'Arial', 'Helvetica Neue', Arial, sans-serif", // Reddit font
+                  }}>{cat.label}</span>
+                </div>
+              ));
+            })()
           )}
         </nav>
 
@@ -879,18 +982,39 @@ export default function Laboratory() {
           {authLoading || profileLoading ? (
             <div className="lab-loading lab-loading-auth">Loading...</div>
           ) : user && profile ? (
-            <>
-              <div className="lab-profile-info">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0.5rem 0', minHeight: 32, maxWidth: '100%' }}>
+              {/* Flag or user photo - size 26px, vertically centered */}
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 26, width: 26, flexShrink: 0 }}>
                 <UserFlag profile={profile} />
-                <span>{profile.username}</span>
-              </div>
+              </span>
+              {/* Username - bigger font, vertically centered, truncate if too long */}
+              <span style={{
+                fontWeight: 700,
+                color: '#fff',
+                fontSize: 21,
+                lineHeight: '26px',
+                marginLeft: 8,
+                marginRight: 8,
+                display: 'flex',
+                alignItems: 'center',
+                height: 26,
+                minWidth: 0,
+                maxWidth: 120,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                flexGrow: 1
+              }}>{profile.username}</span>
+              {/* Logout icon button - red color, size 26px, moved slightly down */}
               <button 
                 onClick={handleLogout} 
                 className="lab-auth-button lab-logout-button"
+                style={{ background: 'none', border: 'none', padding: 0, marginLeft: 0, marginBottom: 0, cursor: 'pointer', color: '#e53935', fontSize: 26, display: 'flex', alignItems: 'flex-end', height: 32, width: 32, justifyContent: 'center', flexShrink: 0 }}
+                title="Log Out"
               >
-                Log Out
+                <FiLogOut />
               </button>
-            </>
+            </div>
           ) : (
             <button 
               onClick={() => setAuthModalOpen(true)} 
@@ -934,7 +1058,10 @@ export default function Laboratory() {
 
         <div className="lab-header">
           {homeCategory && selectedCategory === homeCategory.label ? (
-            <h1 className="lab-header-title" style={{ letterSpacing: '0.01em', fontWeight: 700, fontSize: 32, color: '#fff' }}>THE LAB</h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <img src={labImg} alt="Lab" style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 12 }} />
+              <h1 className="lab-header-title" style={{ letterSpacing: '0.01em', fontWeight: 700, fontSize: 32, color: '#fff', margin: 0 }}>THE LAB</h1>
+            </div>
           ) : (
             <>
               <CategoryIcon category={currentCategory} />
@@ -1177,7 +1304,7 @@ export default function Laboratory() {
               }
               return 0;
             });
-            const postComments = postCommentsRaw.slice(0, visibleCommentsCount);
+            // const postComments = postCommentsRaw.slice(0, visibleCommentsCount); // unused after recursion
             const hasMoreComments = visibleCommentsCount < postCommentsRaw.length;
             return (
               <div className="lab-post-card lab-post-detail">
@@ -1189,21 +1316,28 @@ export default function Laboratory() {
                   >
                     <IoArrowBackOutline style={{ marginRight: 6 }} /> Back to Posts
                   </button>
-                  {/* Category on far right */}
-                  <div style={{ display: 'flex', alignItems: 'center', marginLeft: 16 }}>
-                    {cat && categoryLogos[cat.label.toLowerCase()] ? (
-                      <img 
-                        src={categoryLogos[cat.label.toLowerCase()]} 
-                        alt={cat.label} 
-                        style={{ width: 28, height: 28, marginRight: 8, objectFit: 'contain' }}
-                      />
-                    ) : (
-                      <span style={{ fontSize: 22, marginRight: 8 }}>{cat?.icon || ''}</span>
-                    )}
-                    <span style={{ color: '#aaa', fontSize: 15, fontWeight: 600 }}>
-                      {cat?.label || ''}
-                    </span>
-                  </div>
+                  {/* Category tag styled like post card */}
+                  {cat && (
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        background: cat.color,
+                        borderRadius: '999px',
+                        padding: '2px 16px',
+                        fontWeight: 500,
+                        fontSize: 15,
+                        color: '#fff',
+                        maxWidth: 120,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        marginLeft: 16,
+                      }}
+                    >
+                      {cat.label}
+                    </div>
+                  )}
                 </div>
                 <div className="lab-post-header" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginBottom: 8 }}>
                   <div className="lab-post-author" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -1255,24 +1389,101 @@ export default function Laboratory() {
                 </div>
                 {/* Comment Form */}
                 {user && profile ? (
-                  <form onSubmit={handleSubmitComment} className="lab-form-row" style={{ marginBottom: 8, alignItems: 'flex-end' }}>
-                    <textarea
-                      placeholder="Add a comment..."
-                      value={newComment}
-                      onChange={e => setNewComment(e.target.value)}
-                      required
-                      className="lab-input lab-input-regular"
-                      style={{ flex: 1, minHeight: 38, maxHeight: 120, resize: 'vertical', fontSize: 14, padding: '8px 12px', borderRadius: 12, border: 'none', background: '#23232a', color: '#fff', fontWeight: 400 }}
-                      rows={1}
-                    />
-                    <button 
-                      type="submit" 
-                      disabled={commentLoading}
-                      className="lab-primary-button lab-button-medium"
-                      style={{ marginLeft: 8 }}
-                    >
-                      {commentLoading ? 'Posting...' : 'Post'}
-                    </button>
+                  <form onSubmit={handleSubmitComment} className="lab-form-row" style={{
+                    marginBottom: 8,
+                    alignItems: 'flex-end',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    width: '100%',
+                  }}>
+                    <div style={{
+                      flex: 1,
+                      background: '#101214',
+                      borderRadius: 14,
+                      border: '1.5px solid #23232a',
+                      padding: '0',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      position: 'relative',
+                      minHeight: 56,
+                    }}>
+                      <textarea
+                        placeholder="Add a comment..."
+                        value={newComment}
+                        onChange={e => {
+                          setNewComment(e.target.value);
+                          // Auto expand logic handled by rows and style
+                        }}
+                        required
+                        className="lab-input lab-input-regular"
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          outline: 'none',
+                          color: '#fff',
+                          fontWeight: 400,
+                          fontSize: 15,
+                          minHeight: 44,
+                          maxHeight: 320, // 10 lines at ~32px/line
+                          resize: 'vertical',
+                          padding: '16px 18px 44px 18px', // extra bottom for buttons
+                          borderRadius: 14,
+                          fontFamily: 'inherit',
+                          overflowY: 'auto',
+                          boxSizing: 'border-box',
+                          transition: 'max-height 0.2s',
+                        }}
+                        rows={Math.min(10, Math.max(2, newComment.split('\n').length))}
+                      />
+                      {/* Buttons inside the box, bottom right */}
+                      <div style={{
+                        position: 'absolute',
+                        right: 14,
+                        bottom: 10,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                      }}>
+                        <button
+                          type="button"
+                          onClick={() => { setNewComment(''); }}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#ccc',
+                            fontSize: 15,
+                            borderRadius: 0,
+                            padding: 0,
+                            cursor: 'pointer',
+                            fontWeight: 500,
+                            transition: 'color 0.15s',
+                          }}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={commentLoading}
+                          className="lab-primary-button lab-button-medium"
+                          style={{
+                          background: '#000000ff',
+                          color: '#fff',
+                          fontWeight: 600,
+                          fontSize: 15,
+                          borderRadius: 8,
+                          padding: '7px 18px',
+                          border: 'none',
+                          cursor: commentLoading ? 'not-allowed' : 'pointer',
+                          opacity: commentLoading ? 0.7 : 1,
+                          transition: 'background 0.15s',
+                          }}
+                          onMouseOver={e => { if (!commentLoading) e.currentTarget.style.background = '#444'; }}
+                          onMouseOut={e => { if (!commentLoading) e.currentTarget.style.background = '#000000ff'; }}
+                        >
+                          {commentLoading ? 'Posting...' : 'Comment'}
+                        </button>
+                      </div>
+                    </div>
                   </form>
                 ) : (
                   <div style={{ color: '#aaa', marginBottom: 8 }}>
@@ -1331,66 +1542,223 @@ export default function Laboratory() {
                 )}
                 {/* Comments List */}
                 <div style={{ width: '100%', maxHeight: 400, overflowY: 'auto', marginBottom: 18 }}>
-                  {postComments.map(c => {
-                    const commenter = profiles.find(p => p.id === c.user_id);
-                    return (
-                      <div key={c.id} className="lab-comment-item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
-                            <div className="lab-comment-author" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                              <UserFlag profile={commenter} />
-                              <span className="lab-comment-author-name">
-                                {commenter?.username || 'Anon'}
-                              </span>
-                              <span style={{ color: '#aaa', fontSize: 13, marginLeft: 2 }}>{timeAgo(c.created_at)}</span>
+                  {/* Threaded comments rendering - recursive */}
+                  {(() => {
+                    // Add type for Comment (should match your actual Comment type)
+                    type ThreadedComment = Comment & { parent_comment_id?: number | null };
+                    // Helper to toggle collapse
+                    const toggleCollapse = (id: number) => setCollapsedThreads(prev => ({ ...prev, [id]: !prev[id] }));
+                    function renderComments(commentList: ThreadedComment[], parentId: number | null = null, depth = 0): React.ReactNode[] {
+                      return commentList
+                        .filter((c: ThreadedComment) => c.parent_comment_id === parentId)
+                        .map((c: ThreadedComment) => {
+                          const commenter = profiles.find(p => p.id === c.user_id);
+                          // Find if this comment has replies
+                          const hasReplies = commentList.some(child => child.parent_comment_id === c.id);
+                          const isCollapsed = collapsedThreads[c.id];
+                          return (
+                            <div key={c.id} className="lab-comment-item" style={{ display: 'flex', alignItems: 'flex-start', gap: 8, flexDirection: 'column', marginBottom: 10, marginTop: 10, marginLeft: depth > 0 ? 24 : 0, borderLeft: depth > 0 ? '2px solid #23232a' : 'none', paddingLeft: depth > 0 ? 12 : 0 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
+                                {/* Chevron expand/collapse button, inline before upvote */}
+                                
+                                <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+                                  <div className="lab-comment-author" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                    <UserFlag profile={commenter} />
+                                    <span className="lab-comment-author-name">
+                                      {commenter?.username || 'Anon'}
+                                    </span>
+                                    <span style={{ color: '#aaa', fontSize: 13, marginLeft: 2 }}>{timeAgo(c.created_at)}</span>
+                                  </div>
+                                  <div className="lab-comment-text" style={{ margin: '2px 0 0 0', wordBreak: 'break-word', whiteSpace: 'pre-line' }}>{c.content}</div>
+                                  <div style={{ display: 'flex', alignItems: 'center', marginTop: 6, marginBottom: 2 }}>
+                                    <button
+                                      onClick={() => handleUpvoteComment(c.id)}
+                                      disabled={!user || commentVoteLoading?.[c.id]}
+                                      className={`lab-vote-button ${userCommentVotes.includes(c.id) ? 'voted' : ''}`}
+                                      title={userCommentVotes.includes(c.id) ? 'Remove upvote' : 'Upvote'}
+                                      style={{ color: userCommentVotes.includes(c.id) ? '#ff4500' : '#878a8c', background: 'none', border: 'none', fontSize: 20, padding: 0, margin: 0, cursor: commentVoteLoading?.[c.id] ? 'not-allowed' : 'pointer', opacity: commentVoteLoading?.[c.id] ? 0.6 : 1, lineHeight: 1 }}
+                                    >
+                                      <BiUpvote />
+                                    </button>
+                                    <span style={{ color: '#fefefe', fontWeight: 700, fontSize: 12, minWidth: 18, textAlign: 'center', lineHeight: 1, marginLeft: 2, marginRight: 14 }}>
+                                      {c.votes?.toLocaleString?.() || 0}
+                                    </span>
+                                    <button
+                                      onClick={() => {
+                                        // Auto-expand if collapsed and has replies
+                                        if (hasReplies && isCollapsed) toggleCollapse(c.id);
+                                        setReplyToCommentId(c.id);
+                                        setReplyContent('');
+                                      }}
+                                      className="lab-reply-icon-btn"
+                                      style={{ marginLeft: 0, marginRight: 14, background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: '#ffffffff', fontSize: 16, display: 'flex', alignItems: 'center' }}
+                                      title="Reply"
+                                      type="button"
+                                    >
+                                      <FaRegComments style={{ fontSize: 16, marginRight: 3, verticalAlign: 'middle' }} />
+                                    </button>
+                                    {(commenter?.id === user?.id || profile?.is_admin) && (
+                                      <button
+                                        onClick={() => handleDeleteComment(c.id)}
+                                        className="lab-delete-icon-btn"
+                                        style={{
+                                          marginLeft: 0,
+                                          background: 'none',
+                                          border: 'none',
+                                          padding: 0,
+                                          cursor: 'pointer',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          color: '#b0b0b0',
+                                          fontSize: 20,
+                                          transition: 'color 0.15s',
+                                          outline: 'none',
+                                        }}
+                                        title="Delete comment"
+                                        type="button"
+                                        onMouseOver={e => (e.currentTarget.style.color = '#e53935')}
+                                        onMouseOut={e => (e.currentTarget.style.color = '#b0b0b0')}
+                                        onFocus={e => (e.currentTarget.style.outline = 'none')}
+                                      >
+                                        <MdOutlineDelete />
+                                      </button>
+                                    )}
+                                    {/* Chevron expand/collapse button at end of action row */}
+                                    {hasReplies && (
+                                      <button
+                                        onClick={() => toggleCollapse(c.id)}
+                                        style={{
+                                          background: 'none',
+                                          border: 'none',
+                                          color: '#888',
+                                          fontSize: 18,
+                                          cursor: 'pointer',
+                                          marginLeft: 10,
+                                          padding: 0,
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          transition: 'color 0.15s, transform 0.15s',
+                                          transform: isCollapsed ? 'rotate(0deg)' : 'rotate(90deg)',
+                                          outline: 'none',
+                                        }}
+                                        title={isCollapsed ? 'Expand thread' : 'Collapse thread'}
+                                        tabIndex={0}
+                                        onMouseOver={e => (e.currentTarget.style.color = '#fff')}
+                                        onMouseOut={e => (e.currentTarget.style.color = '#888')}
+                                      >
+                                        <FaChevronRight />
+                                      </button>
+                                    )}
+                                  </div>
+                                  {/* Reply form for this comment */}
+                                  {replyToCommentId === c.id && (
+                                    <div style={{ position: 'relative', width: '100%' }}>
+                                      <form onSubmit={handleSubmitReply} style={{
+                                        marginTop: 10,
+                                        marginBottom: 8,
+                                        background: '#181c1f',
+                                        borderRadius: 16,
+                                        border: '1.5px solid #333',
+                                        boxShadow: '0 2px 8px 0 #00000033',
+                                        padding: '18px 18px 12px 18px',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'stretch',
+                                        gap: 0,
+                                        width: 'auto',
+                                        maxWidth: 'min(100vw, 800px)',
+                                        minWidth: 320,
+                                        position: 'absolute',
+                                        left: 0,
+                                        right: 0,
+                                        zIndex: 10,
+                                        alignSelf: 'unset',
+                                      }}>
+                                      <textarea
+                                        placeholder="Add a reply..."
+                                        value={replyContent}
+                                        onChange={e => setReplyContent(e.target.value)}
+                                        required
+                                        className="lab-input lab-input-regular"
+                                        style={{
+                                          minHeight: 64,
+                                          maxHeight: 180,
+                                          resize: 'vertical',
+                                          fontSize: 15,
+                                          padding: '12px 14px',
+                                          borderRadius: 10,
+                                          border: 'none',
+                                          background: '#23232a',
+                                          color: '#fff',
+                                          fontWeight: 400,
+                                          marginBottom: 16,
+                                        }}
+                                        rows={3}
+                                        autoFocus
+                                      />
+                                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+                                        <button
+                                          type="button"
+                                          onClick={() => { setReplyToCommentId(null); setReplyContent(''); }}
+                                          style={{
+                                            background: '#23232a',
+                                            border: 'none',
+                                            color: '#ccc',
+                                            fontSize: 15,
+                                            borderRadius: 8,
+                                            padding: '7px 18px',
+                                            cursor: 'pointer',
+                                            fontWeight: 500,
+                                            transition: 'background 0.15s',
+                                          }}
+                                        >
+                                          Cancel
+                                        </button>
+                                        <button
+                                          type="submit"
+                                          disabled={replyLoading}
+                                          className="lab-primary-button lab-button-medium"
+                                          style={{
+                                            background: '#0064e0',
+                                            color: '#fff',
+                                            fontWeight: 600,
+                                            fontSize: 18,
+                                            borderRadius: 8,
+                                            padding: '7px 18px',
+                                            border: 'none',
+                                            cursor: replyLoading ? 'not-allowed' : 'pointer',
+                                            opacity: replyLoading ? 0.7 : 1,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                          }}
+                                          title={replyLoading ? 'Replying...' : 'Reply'}
+                                        >
+                                          {replyLoading ? (
+                                            <span style={{ fontSize: 15 }}>Replying...</span>
+                                          ) : (
+                                            <FaRegComments style={{ fontSize: 20, marginRight: 0, verticalAlign: 'middle' }} />
+                                          )}
+                                        </button>
+                                      </div>
+                                    </form>
+                                    </div>
+                                  )}
+                                  {replyError && replyToCommentId === c.id && (
+                                    <div className="lab-error" style={{ marginTop: 4 }}>{replyError}</div>
+                                  )}
+                                  {/* Render nested replies recursively, only if not collapsed */}
+                                  {!isCollapsed && renderComments(commentList, c.id, depth + 1)}
+                                </div>
+                              </div>
                             </div>
-                            <div className="lab-comment-text" style={{ margin: '2px 0 0 0', wordBreak: 'break-word', whiteSpace: 'pre-line' }}>{c.content}</div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 0, marginTop: 6, marginBottom: 2 }}>
-                              <button
-                                onClick={() => handleUpvoteComment(c.id)}
-                                disabled={!user || commentVoteLoading?.[c.id]}
-                                className={`lab-vote-button ${userCommentVotes.includes(c.id) ? 'voted' : ''}`}
-                                title={userCommentVotes.includes(c.id) ? 'Remove upvote' : 'Upvote'}
-                                style={{ color: userCommentVotes.includes(c.id) ? '#ff4500' : '#878a8c', background: 'none', border: 'none', fontSize: 20, padding: 0, margin: 0, cursor: commentVoteLoading?.[c.id] ? 'not-allowed' : 'pointer', opacity: commentVoteLoading?.[c.id] ? 0.6 : 1, lineHeight: 1 }}
-                              >
-                                <BiUpvote />
-                              </button>
-                              <span style={{ color: '#fefefe', fontWeight: 700, fontSize: 12, minWidth: 18, textAlign: 'center', lineHeight: 1, marginLeft: 2, marginRight: 6 }}>
-                                {c.votes?.toLocaleString?.() || 0}
-                              </span>
-                              {(commenter?.id === user?.id || profile?.is_admin) && (
-                                <button
-                                  onClick={() => handleDeleteComment(c.id)}
-                                  className="lab-delete-icon-btn"
-                                  style={{
-                                    marginLeft: 1,
-                                    background: 'none',
-                                    border: 'none',
-                                    padding: 0,
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    color: '#b0b0b0',
-                                    fontSize: 20,
-                                    transition: 'color 0.15s',
-                                    outline: 'none',
-                                  }}
-                                  title="Delete comment"
-                                  type="button"
-                                  onMouseOver={e => (e.currentTarget.style.color = '#e53935')}
-                                  onMouseOut={e => (e.currentTarget.style.color = '#b0b0b0')}
-                                  onFocus={e => (e.currentTarget.style.outline = 'none')}
-                                >
-                                  <MdOutlineDelete />
-                                </button>
-                              )}
-                            </div>
-                            {/* Thin line after each comment */}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+                          );
+                        });
+                    }
+                    // Only show up to visibleCommentsCount top-level comments
+                    // const topLevelComments = postCommentsRaw.filter(c => !c.parent_comment_id).slice(0, visibleCommentsCount); // unused after recursion
+                    return renderComments(postCommentsRaw as ThreadedComment[], null, 0);
+                  })()}
                   {hasMoreComments && (
                     <div style={{ display: 'flex', justifyContent: 'center', marginTop: 10 }}>
                       <button
@@ -1431,17 +1799,23 @@ export default function Laboratory() {
                       <span style={{ color: '#aaa', fontSize: 13, marginLeft: 2 }}>{timeAgo(post.created_at)}</span>
                     </div>
                     {showCommunity && postCat && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        {categoryLogos[postCat.label.toLowerCase()] ? (
-                          <img
-                            src={categoryLogos[postCat.label.toLowerCase()]}
-                            alt={postCat.label}
-                            style={{ width: 22, height: 22, objectFit: 'contain', borderRadius: '100%' }}
-                          />
-                        ) : (
-                          <span style={{ fontSize: 18, color: postCat.color }}>{postCat.icon}</span>
-                        )}
-                        <span style={{ color: postCat.color, fontWeight: 600, fontSize: 14 }}>{postCat.label}</span>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          background: postCat.color,
+                          borderRadius: '999px',
+                          padding: '2px 16px',
+                          fontWeight: 500,
+                          fontSize: 15,
+                          color: '#fff',
+                          maxWidth: 120,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {postCat.label}
                       </div>
                     )}
                   </div>
@@ -1497,7 +1871,7 @@ export default function Laboratory() {
                     <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
                       <button
                         onClick={() => {
-                          if (window.confirm('Are you sure you want to delete this post?')) handleDeletePost(post.id);
+                          handleDeletePost(post.id);
                         }}
                         className="lab-delete-icon-btn"
                         style={{
@@ -1657,4 +2031,4 @@ export default function Laboratory() {
       {/* Post Detail Modal removed, now handled in main content */}
     </div>
   );
-}   
+}

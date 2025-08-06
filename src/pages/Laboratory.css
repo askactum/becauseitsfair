@@ -177,6 +177,8 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  font-family: 'Segoe UI', 'Inter', 'Roboto', Arial, sans-serif;
+  overflow: hidden;
 }
 
 .lab-right-sidebar {
@@ -227,6 +229,10 @@
 .lab-nav {
   width: 100%;
   margin-top: 40px;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  max-height: calc(100vh - 200px); /* leave space for logo and auth section */
+  padding-right: 4px; /* for scrollbar */
 }
 
 .lab-nav-item {
@@ -301,8 +307,8 @@
 }
 
 .lab-login-button {
-  padding: 0.7rem 2.2rem;
-  font-size: 20px;
+  padding: 0.5rem 1.2rem;
+  font-size: 15px;
   margin: 2.5rem 0 1.5rem 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
