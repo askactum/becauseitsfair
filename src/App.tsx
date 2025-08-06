@@ -11,7 +11,6 @@ import Plan from './pages/Plan';
 import Donate from './pages/Donate';
 import Contact from './pages/Contact';
 import Laboratory from './pages/Laboratory';
-import LabTransition from './pages/LabTransition';
 import Shop from './pages/Shop';
 import Progress from './pages/Progress';
 import Applications from './pages/Applications';
@@ -57,7 +56,6 @@ function AnimatedRoutes() {
           { path: '/progress', element: <Progress /> },
           { path: '/donate', element: <Donate /> },
           { path: '/contact', element: <Contact /> },
-          { path: '/lab-transition', element: <LabTransition /> },
           { path: '/lab', element: <Lab /> },
           { path: '/laboratory', element: <Laboratory /> },
           { path: '/shop', element: <Shop /> },
