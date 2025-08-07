@@ -1540,7 +1540,7 @@ export default function Laboratory() {
                                       disabled={!user || commentVoteLoading?.[c.id]}
                                       className={`lab-vote-button ${userCommentVotes.includes(c.id) ? 'voted' : ''}`}
                                       title={userCommentVotes.includes(c.id) ? 'Remove upvote' : 'Upvote'}
-                                      style={{ color: userCommentVotes.includes(c.id) ? '#ff4500' : '#878a8c', background: 'none', border: 'none', fontSize: 20, padding: 0, margin: 0, cursor: commentVoteLoading?.[c.id] ? 'not-allowed' : 'pointer', opacity: commentVoteLoading?.[c.id] ? 0.6 : 1, lineHeight: 1 }}
+                                      style={{ color: userCommentVotes.includes(c.id) ? '#ff4500' : '#878a8c', fill: userCommentVotes.includes(c.id) ? '#ff4500' : '#878a8c', background: 'none', border: 'none', fontSize: 20, padding: 0, margin: 0, cursor: commentVoteLoading?.[c.id] ? 'not-allowed' : 'pointer', opacity: commentVoteLoading?.[c.id] ? 0.6 : 1, lineHeight: 1 }}
                                     >
                                       <BiUpvote />
                                     </button>

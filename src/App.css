@@ -1297,6 +1297,51 @@ team-member-photo {
 .floating-lab {
   right: 20px;
   bottom: 20px;
+  position: fixed;
+  z-index: 2000;
+  width: 150px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.18s;
+}
+
+.floating-lab::before,
+.floating-lab::after {
+  content: '';
+  position: absolute;
+  background: rgba(0, 0, 0, 5);
+  border-radius: 50%;
+  animation: floatBubble 4s infinite ease-in-out;
+}
+
+.floating-lab::before {
+  width: 20px;
+  height: 20px;
+  top: -10px;
+  left: 80px;
+  animation-delay: .5s;
+}
+
+.floating-lab::after {
+  width: 15px;
+  height: 15px;
+  top: 10px;
+  left: 60px;
+  animation-delay: 1s;
+}
+
+@keyframes floatBubble {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-15px) scale(1.1);
+    opacity: 0.9;
+  }
 }
 @media (max-width: 900px) {
   .floating-icon {
