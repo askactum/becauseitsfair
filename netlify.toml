@@ -1,12 +1,2 @@
 [build]
   functions = "netlify/functions"
-
-[[plugins]]
-  package = "@netlify/plugin-functions-install-core"
-
-[[plugins]]
-  package = "@netlify/plugin-scheduled-functions"
-
-[[schedule]]
-  cron = "0 12 * * *"  # Run daily at 12pm UTC (5am/8am PST/EST)
-  function = "update-paypal-total"

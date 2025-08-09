@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import amountImg from '../assets/moneyGIF.gif';
 import homeImg from '../assets/homeGIF.gif';
 import './Progress.css';
+import { supabase } from '../supabaseClient';
 
 const CACHE_KEY = 'paypalTotalCache';
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -50,7 +51,7 @@ export default function Progress() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Fetch the PayPal total with caching
+  // Fetch donation data from Supabase with caching
   useEffect(() => {
     // Try to get cached data first
     const cached = getCachedData();
@@ -60,22 +61,35 @@ export default function Progress() {
     }
 
     // Always fetch fresh data in background
-    fetch('/.netlify/functions/paypal-total')
-      .then(res => res.json())
-      .then(data => {
-        if (data.total !== undefined) {
-          setAmount(data.total);
-          setLastTransactionDate(data.last_transaction_date || null);
-          setCachedData(data.total, data.last_transaction_date || null);
+    const fetchDonations = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('paypal_totals')
+          .select('total, last_transaction_date, updated_at')
+          .order('updated_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          const totalVal = data.reduce((sum: number, donation: { total: number }) => sum + donation.total, 0);
+          const lastDate = data[0].last_transaction_date;
+          setAmount(totalVal);
+          setLastTransactionDate(lastDate);
+          setCachedData(totalVal, lastDate);
+        } else {
+          setAmount(0);
+          setLastTransactionDate(null);
         }
-      })
-      .catch(() => {
+      } catch {
         // Only fallback to 0 if we don't have cached data
         if (!cached) {
           setAmount(0);
           setLastTransactionDate(null);
         }
-      });
+      }
+    };
+
+    fetchDonations();
     setHomesBuilt(0);
   }, []);
 
