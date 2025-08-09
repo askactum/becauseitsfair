@@ -40,13 +40,13 @@ const BUTTONS = [
 ];
 
 // Image size configurations (for PayPal button images)
-const IMAGE_SIZES = {
-  small: 100,
-  medium: 150,
-  large: 200,
-  xlarge: 250,
-  xxlarge: 250
-};
+// const IMAGE_SIZES = {
+//   small: 100,
+//   medium: 150,
+//   large: 200,
+//   xlarge: 250,
+//   xxlarge: 250
+// };
 
 
 const Donate: React.FC = () => {
