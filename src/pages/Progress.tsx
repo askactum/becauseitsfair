@@ -125,7 +125,7 @@ export default function Progress() {
         <div className="progress-stat-text">
           <div className="progress-stat-title">total amount raised</div>
           <div className="progress-stat-value">
-            {amount !== null ? `$${displayAmount.toLocaleString()}` : '...'}
+            {amount !== null ? `$${displayAmount.toLocaleString()}` : '0'}
           </div>
         </div>
       </div>
