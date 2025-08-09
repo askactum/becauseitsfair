@@ -3,6 +3,31 @@ import amountImg from '../assets/moneyGIF.gif';
 import homeImg from '../assets/homeGIF.gif';
 import './Progress.css';
 
+const CACHE_KEY = 'paypalTotalCache';
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+interface CacheData {
+  amount: number;
+  lastTransactionDate: string | null;
+  timestamp: number;
+}
+
+function getCachedData(): CacheData | null {
+  const cached = localStorage.getItem(CACHE_KEY);
+  if (!cached) return null;
+  const data = JSON.parse(cached);
+  if (Date.now() - data.timestamp > CACHE_TTL) return null;
+  return data;
+}
+
+function setCachedData(amount: number, lastTransactionDate: string | null) {
+  localStorage.setItem(CACHE_KEY, JSON.stringify({
+    amount,
+    lastTransactionDate,
+    timestamp: Date.now()
+  }));
+}
+
 function formatDisplayDate(isoString: string | null): string {
   if (!isoString) return 'N/A';
   const date = new Date(isoString);
@@ -25,17 +50,31 @@ export default function Progress() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Fetch the real amount (placeholder for now)
+  // Fetch the PayPal total with caching
   useEffect(() => {
+    // Try to get cached data first
+    const cached = getCachedData();
+    if (cached) {
+      setAmount(cached.amount);
+      setLastTransactionDate(cached.lastTransactionDate);
+    }
+
+    // Always fetch fresh data in background
     fetch('/.netlify/functions/paypal-total')
       .then(res => res.json())
       .then(data => {
-        setAmount(data.total);
-        setLastTransactionDate(data.last_transaction_date || null);
+        if (data.total !== undefined) {
+          setAmount(data.total);
+          setLastTransactionDate(data.last_transaction_date || null);
+          setCachedData(data.total, data.last_transaction_date || null);
+        }
       })
       .catch(() => {
-        setAmount(0);
-        setLastTransactionDate(null);
+        // Only fallback to 0 if we don't have cached data
+        if (!cached) {
+          setAmount(0);
+          setLastTransactionDate(null);
+        }
       });
     setHomesBuilt(0);
   }, []);

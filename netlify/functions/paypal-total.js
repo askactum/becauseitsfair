@@ -1,4 +1,7 @@
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+import { supabase } from '../../src/supabaseClient';
+
+const MAX_CACHE_AGE = 24 * 60 * 60 * 1000; // 24 hours
 
 function formatDate(date) {
   const pad = n => n.toString().padStart(2, '0');
@@ -13,6 +16,24 @@ function formatDate(date) {
 
 export default async function handler(event, context) {
   try {
+    // First try to get cached data from Supabase
+    const { data, error } = await supabase
+      .from('paypal_totals')
+      .select('*')
+      .eq('id', 1)
+      .single();
+
+    if (!error && data && (new Date() - new Date(data.updated_at)) < MAX_CACHE_AGE) {
+      return new Response(
+        JSON.stringify({
+          total: data.total,
+          last_transaction_date: data.last_transaction_date
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Fall back to PayPal API if no recent cached data
     const auth = Buffer.from(`${process.env.VITE_PAYPAL_CLIENT_ID}:${process.env.VITE_PAYPAL_SECRET}`).toString('base64');
     const tokenRes = await fetch('https://api-m.paypal.com/v1/oauth2/token', {
       method: 'POST',
