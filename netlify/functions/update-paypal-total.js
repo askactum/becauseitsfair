@@ -1,6 +1,14 @@
 import { supabase } from '../../src/supabaseClient';
 
 export default async function handler(event, context) {
+  // Handle direct HTTP requests
+  if (event.httpMethod === 'GET') {
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ message: 'Use POST to trigger update' })
+    };
+  }
+
   try {
     // First get current total from PayPal API
     const auth = Buffer.from(`${process.env.VITE_PAYPAL_CLIENT_ID}:${process.env.VITE_PAYPAL_SECRET}`).toString('base64');
@@ -59,16 +67,20 @@ export default async function handler(event, context) {
 
     if (error) throw error;
 
-    return new Response(
-      JSON.stringify({ success: true }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ 
+        success: true,
+        total: Number(total.toFixed(2)),
+        last_transaction_date: lastTransactionDate ? lastTransactionDate.toISOString() : null
+      })
+    };
   } catch (err) {
     console.error('Scheduled function error:', err);
-    return new Response(
-      JSON.stringify({ error: err.message }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message })
+    };
   }
 }
 

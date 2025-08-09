@@ -1,153 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Donate Buttons</title>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Spinning Key</title>
     <style>
-        /* General Body Styling */
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #f0f2f5;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        /* Container for the buttons */
-        .donate-container {
-            display: flex;
-            flex-wrap: wrap; /* Allows buttons to wrap on smaller screens */
-            justify-content: center;
-            align-items: flex-end; /* Aligns buttons to their bottom edge */
-            gap: 20px; /* Space between the buttons */
-            padding: 20px;
-        }
-
-        /* Individual donate button styling */
-        .donate-button {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-decoration: none;
-            color: #000000;
-            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            cursor: pointer;
-        }
-
-        /* Hover effect: slight scaling */
-        .donate-button:hover {
-            transform: scale(1.08);
-        }
-
-        /* SVG house styling */
-        .house-svg {
-            width: 100%;
-            height: auto;
-            stroke: #000000; /* Dark gray outline */
-            stroke-width: 6;
-            stroke-linejoin: round; /* Rounded corners for the stroke */
-            fill: #ffffff; /* White fill initially */
-            transition: fill 0.4s ease;
-        }
-        
-        /* Smooth fill transition on hover */
-        .donate-button:hover .house-svg {
-            fill: #000000; /* Fill with black on hover */
-        }
-
-        /* Dollar amount text styling */
-        .amount {
-            position: absolute;
-            /* Adjust top position to be more centered in the house base */
-            top: 65%;
-            left: 47%;
-            transform: translate(-50%, -50%); /* Precise centering */
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #000000; /* Dark gray text */
-            transition: color 0.4s ease;
-            pointer-events: none; /* Allows hover to pass through to the SVG */
-        }
-
-        /* Change text to white on hover */
-        .donate-button:hover .amount {
-            color: #ffffff;
-        }
-
-        /* Superscript dollar sign */
-        .dollar-sign {
-            font-size: 0.5em;
-            vertical-align: super; /* Creates the superscript effect */
-            margin-right: 1px;
-            font-weight: normal;
-        }
-
-        /* Increasing sizes for each button */
-        .donate-button.size-1 { width: 80px; }
-        .donate-button.size-2 { width: 100px; }
-        .donate-button.size-3 { width: 120px; }
-        .donate-button.size-4 { width: 140px; }
-
-        /* Adjust font size based on button size for better proportions */
-        .donate-button.size-1 .amount { font-size: 1.4em; }
-        .donate-button.size-2 .amount { font-size: 1.6em; }
-        .donate-button.size-3 .amount { font-size: 1.9em; }
-        .donate-button.size-4 .amount { font-size: 2.2em; }
+      body { margin: 0; overflow: hidden; }
+      canvas { display: block; }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <script type="module">
+      import * as THREE from '../../node_modules/three/build/three.module.js';
+      import { OrbitControls } from '../../node_modules/three/examples/jsm/controls/OrbitControls.js';
+      import { GLTFLoader } from '../../node_modules/three/examples/jsm/loaders/GLTFLoader.js';
 
-    <div class="donate-container">
-        <!-- $5 Button -->
-        <a href="#donate-5" class="donate-button size-1">
-            <svg class="house-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <!-- Pitched Roof -->
-                <path d="M0 40 L50 5 L100 40Z"></path>
-                <!-- House Body -->
-                <path d="M10 95 L10 40 L90 40 L90 95 Z"></path>
-            </svg>
-            <div class="amount">
-                <span class="dollar-sign">$</span>5
-            </div>
-        </a>
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xffffff);
 
-        <!-- $20 Button -->
-        <a href="#donate-20" class="donate-button size-2">
-            <svg class="house-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <path d="M0 40 L50 5 L100 40Z"></path>
-                <path d="M10 95 L10 40 L90 40 L90 95 Z"></path>
-            </svg>
-            <div class="amount">
-                <span class="dollar-sign">$</span>20
-            </div>
-        </a>
+      const camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.5, 100);
+      camera.position.set(-3.63, 0.5, 7.35);
+      camera.zoom = 1;
+      camera.updateProjectionMatrix();
 
-        <!-- $50 Button -->
-        <a href="#donate-50" class="donate-button size-3">
-            <svg class="house-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <path d="M0 40 L50 5 L100 40Z"></path>
-                <path d="M10 95 L10 40 L90 40 L90 95 Z"></path>
-            </svg>
-            <div class="amount">
-                <span class="dollar-sign">$</span>50
-            </div>
-        </a>
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
 
-        <!-- $100 Button -->
-        <a href="#donate-100" class="donate-button size-4">
-            <svg class="house-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <path d="M0 40 L50 5 L100 40Z"></path>
-                <path d="M10 95 L10 40 L90 40 L90 95 Z"></path>
-            </svg>
-            <div class="amount">
-                <span class="dollar-sign">$</span>100
-            </div>
-        </a>
-    </div>
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.enableZoom = true;
+      controls.target.set(0.03, 1.64, -0.45);
+      
+      controls.addEventListener('change', () => {
+        console.log('Camera Position:', camera.position);
+        console.log('Camera Target:', controls.target);
+        console.log('Zoom Level:', camera.zoom);
+        console.log('---');
+      });
 
-</body>
+      // Lighting
+      const light = new THREE.DirectionalLight(0xffffff, 1);
+      light.position.set(10, 20, 7.5);
+      scene.add(light);
+      scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+
+      // Load GLB key
+      const loader = new GLTFLoader();
+      let keyObject;
+
+      loader.load(
+        '../../assets/key.glb',
+        (gltf) => {
+          console.log('GLB loaded:', gltf);
+          
+          // Log materials and textures
+          gltf.scene.traverse((child) => {
+            if (child.isMesh) {
+              console.log('Mesh:', child.name);
+              console.log('Material:', child.material);
+              if (child.material.map) console.log('Texture:', child.material.map);
+            }
+          });
+
+          const keyGroup = new THREE.Group();
+          const keyModel = gltf.scene;
+          keyModel.scale.set(0.02, 0.02, 0.02);
+          keyModel.position.y = 2;
+          keyGroup.add(keyModel);
+          scene.add(keyGroup);
+          keyObject = keyGroup;
+        },
+        (xhr) => {
+          console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+        },
+        (error) => {
+          console.error('Error loading GLB:', error);
+        }
+      );
+
+      // Holder ring
+      const holderGeometry = new THREE.TorusGeometry(1, 0.2, 16, 100);
+      const holderMaterial = new THREE.MeshStandardMaterial({
+        metalness: 1,
+        roughness: 0.3,
+        color: 0xffffff,
+        emissive: 0x000000
+      });
+      const holder = new THREE.Mesh(holderGeometry, holderMaterial);
+      holder.rotation.x = Math.PI / 2;
+      scene.add(holder);
+
+      // Animate
+      function animate() {
+        requestAnimationFrame(animate);
+        if (keyObject) {
+          keyObject.rotation.y += 0.01;
+        }
+        controls.update();
+        renderer.render(scene, camera);
+      }
+
+      animate();
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    </script>
+  </body>
 </html>
