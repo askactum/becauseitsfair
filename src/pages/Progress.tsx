@@ -62,32 +62,34 @@ export default function Progress() {
 
     // Always fetch fresh data in background
     const fetchDonations = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('paypal_totals')
-          .select('total, last_transaction_date, updated_at')
-          .order('updated_at', { ascending: false });
+  try {
+      const { data, error } = await supabase
+        .from('paypal_totals')
+        .select('total, last_transaction_date, updated_at')
+        .order('updated_at', { ascending: false })
+        .limit(1) // only get the latest record
+        .single(); // return a single object instead of an array
 
-        if (error) throw error;
+      if (error) throw error;
 
-        if (data && data.length > 0) {
-          const totalVal = data.reduce((sum: number, donation: { total: number }) => sum + donation.total, 0);
-          const lastDate = data[0].last_transaction_date;
-          setAmount(totalVal);
-          setLastTransactionDate(lastDate);
-          setCachedData(totalVal, lastDate);
-        } else {
-          setAmount(0);
-          setLastTransactionDate(null);
-        }
-      } catch {
-        // Only fallback to 0 if we don't have cached data
-        if (!cached) {
-          setAmount(0);
-          setLastTransactionDate(null);
-        }
+      if (data) {
+        const totalVal = data.total || 0;
+        const lastDate = data.last_transaction_date || null;
+        setAmount(totalVal);
+        setLastTransactionDate(lastDate);
+        setCachedData(totalVal, lastDate);
+      } else {
+        setAmount(0);
+        setLastTransactionDate(null);
       }
-    };
+    } catch {
+      // Only fallback to 0 if we don't have cached data
+      if (!cached) {
+        setAmount(0);
+        setLastTransactionDate(null);
+      }
+    }
+  };
 
     fetchDonations();
     setHomesBuilt(0);
