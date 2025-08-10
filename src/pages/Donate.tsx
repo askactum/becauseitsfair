@@ -128,7 +128,7 @@ const Donate: React.FC = () => {
                 }
               }}
             >
-              <img src="/src/assets/actum.svg" className="actum-logo" alt="Actum" />
+              <img src="/assets/actum.svg" className="actum-logo" alt="Actum" />
               <div className="amount">
                 {!btn.isCustom && <span className="dollar-sign">$</span>}
                 {btn.amount}
@@ -167,7 +167,7 @@ const Donate: React.FC = () => {
                 }
               }}
             >
-              <img src="/src/assets/actum.svg" className="actum-logo" alt="Actum" />
+              <img src="/assets/actum.svg" className="actum-logo" alt="Actum" />
               <div className="amount">
                 {btn.amount}
               </div>
