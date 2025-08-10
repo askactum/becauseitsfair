@@ -128,10 +128,7 @@ const Donate: React.FC = () => {
                 }
               }}
             >
-              <svg className="house-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <path d="M0 40 L50 5 L100 40Z"></path>
-                <path d="M10 95 L10 40 L90 40 L90 95 Z"></path>
-              </svg>
+              <img src="/src/assets/actum.svg" className="actum-logo" alt="Actum" />
               <div className="amount">
                 {!btn.isCustom && <span className="dollar-sign">$</span>}
                 {btn.amount}
@@ -139,7 +136,7 @@ const Donate: React.FC = () => {
             </a>
           ))}
         </div>
-                <div className="custom-button-row" style={{ display: 'flex', justifyContent: 'center' }}>
+        <div className="custom-button-row" style={{ display: 'flex', justifyContent: 'center', gap: '3.5rem' }}>
           {BUTTONS.filter(btn => btn.isCustom).map((btn) => (
             <a
               key={btn.id}
@@ -170,10 +167,7 @@ const Donate: React.FC = () => {
                 }
               }}
             >
-              <svg className="house-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <path d="M0 40 L50 5 L100 40Z"></path>
-                <path d="M10 95 L10 40 L90 40 L90 95 Z"></path>
-              </svg>
+              <img src="/src/assets/actum.svg" className="actum-logo" alt="Actum" />
               <div className="amount">
                 {btn.amount}
               </div>

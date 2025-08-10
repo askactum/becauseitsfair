@@ -26,24 +26,19 @@
     transform: scale(1.08);
 }
 
-.house-svg {
+.actum-logo {
     width: 100%;
     height: auto;
-    stroke: #000000;
-    stroke-width: 4;
-    stroke-linejoin: round;
-    fill: #ffffff;
-    transition: fill 0.7s ease;
+    filter: brightness(0);
+    transition: filter 0.7s ease;
 }
 
-.donate-button:hover .house-svg {
-    fill: #000000;
-}
+
 
 .amount {
     position: absolute;
-    top: 65%;
-    left: 47%;
+    top: 55%;
+    left: 48%;
     transform: translate(-50%, -50%);
     font-size: 3.0em;
     font-weight: bold;
@@ -54,11 +49,11 @@
 
 /* different amount for the size-custom button */
 .donate-button.size-custom .amount {
-    left: 50%;
+    left: 49%;
 }
 
 .donate-button:hover .amount {
-    color: #ffffff;
+    color: #000000;
 }
 
 .dollar-sign {
@@ -68,32 +63,32 @@
     font-weight: normal;
 }
 
-.donate-button.size-1 { width: 100px; }
-.donate-button.size-2 { width: 130px; }
-.donate-button.size-3 { width: 160px; }
-.donate-button.size-4 { width: 190px; }
-.donate-button.size-custom { width: 160px; }
+.donate-button.size-1 { width: 200px; }
+.donate-button.size-2 { width: 250px; }
+.donate-button.size-3 { width: 300px; }
+.donate-button.size-4 { width: 375px; }
+.donate-button.size-custom { width: 355px; }
 
 .donate-button.size-1 .amount { font-size: 3em; font-family: Arial, sans-serif; }
 .donate-button.size-2 .amount { font-size: 3.3em; font-family: Arial, sans-serif; }
 .donate-button.size-3 .amount { font-size: 3.6em; font-family: Arial, sans-serif; }
 .donate-button.size-4 .amount { font-size: 3.9em; font-family: Arial, sans-serif; }
-.donate-button.size-custom .amount { font-size: 2.3em; font-family: Arial, sans-serif; }
+.donate-button.size-custom .amount { 
+  font-size: 2.3em; 
+  font-family: Arial, sans-serif; 
+}
 
-.donate-button:hover .amount {
-    font-size: 4.2em;
+.actum-logo {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  transition: all 0.7s ease;
 }
-.donate-button.size-2:hover .amount {
-    font-size: 4.5em;
-}
-.donate-button.size-3:hover .amount {
-    font-size: 4.8em;
-}
-.donate-button.size-4:hover .amount {
-    font-size: 5.1em;
-}
-.donate-button.size-custom:hover .amount {
-    font-size: 2.7em;
+
+.donate-button:hover .actum-logo {
+    /* //filter: brightness(0) invert(1); */
+    fill: #000000; /* Change to black on hover */
+    color: #000000;
 }
 
 .donate-page {
