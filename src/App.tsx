@@ -1,9 +1,7 @@
 import './App.css';
 import './fade-transition.css';
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import logo from './assets/Actum_Official_Logo.jpg';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
 import Mission from './pages/Mission';
 import Team from './pages/Team';
@@ -15,22 +13,23 @@ import Shop from './pages/Shop';
 import Progress from './pages/Progress';
 import Applications from './pages/Applications';
 import { FaYoutube, FaInstagram, FaFacebook, FaTiktok, FaXTwitter, FaTwitch } from 'react-icons/fa6';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import shopImg from './assets/shop.png';
 import donateImg from './assets/donate.png';
 import labImg from './assets/lab.png';
 import Lab from './pages/Lab';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 
 const sidebarLinks = [
-  { label: 'mission', href: '/mission' },
-  { label: 'team', href: '/team' },
-  { label: 'our plan', href: '/plan' },
-  { label: 'track our progress', href: '/progress' },
-  { label: 'application for housing', href: '/applications' },
-  { label: 'donate', href: '/donate' },
-  { label: 'contact', href: '/contact' },
-  { label: 'the laboratory', href: '/lab' },
-  { label: 'shop', href: '/shop' },
+  { label: 'mission', path: '/mission' },
+  { label: 'team', path: '/team' },
+  { label: 'our plan', path: '/plan' },
+  { label: 'track our progress', path: '/progress' },
+  { label: 'application for housing', path: '/applications' },
+  { label: 'donate', path: '/donate' },
+  { label: 'contact', path: '/contact' },
+  { label: 'the laboratory', path: '/lab' },
+  { label: 'shop', path: '/shop' },
 ];
 
 const socialLinks = [
@@ -42,67 +41,20 @@ const socialLinks = [
   { label: 'Twitch', href: 'https://www.twitch.tv/universalhousing', icon: <FaTwitch /> },
 ];
 
-function AnimatedRoutes() {
-  const location = useLocation();
-
-  return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.key}>
-        {[
-          { path: '/', element: <Home /> },
-          { path: '/mission', element: <Mission /> },
-          { path: '/team', element: <Team /> },
-          { path: '/plan', element: <Plan /> },
-          { path: '/progress', element: <Progress /> },
-          { path: '/donate', element: <Donate /> },
-          { path: '/contact', element: <Contact /> },
-          { path: '/lab', element: <Lab /> },
-          { path: '/laboratory', element: <Laboratory /> },
-          { path: '/shop', element: <Shop /> },
-          { path: '/applications', element: <Applications /> },
-        ].map(({ path, element }) => (
-          <Route
-            key={path}
-            path={path}
-            element={
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                {element}
-              </motion.div>
-            }
-          />
-        ))}
-      </Routes>
-    </AnimatePresence>
-  );
-}
-
-function AppLayout() {
-  const [showDropdown, setShowDropdown] = useState(false);
+function Navigation() {
   const [isMobile, setIsMobile] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [showLab, setShowLab] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
 
   // Responsive detection for mobile and smaller screens
   useEffect(() => {
     function handleResize() {
-      setIsMobile(window.innerWidth <= 1024); // 1024px covers tablets and smaller
+      setIsMobile(window.innerWidth <= 1024);
     }
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  // Close mobile menu when navigating
-  useEffect(() => {
-    setShowMobileMenu(false);
-  }, [location]);
 
   // Close menu on outside click
   useEffect(() => {
@@ -118,196 +70,144 @@ function AppLayout() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, [showMobileMenu]);
 
-  // Intercept navigation to /laboratory for transition
-  useEffect(() => {
-    if (location.pathname === '/laboratory' && !showLab) {
-      setShowLab(true);
-    } else if (location.pathname !== '/laboratory' && showLab) {
-      setShowLab(false);
-    }
-  }, [location.pathname]);
-
-  // Custom handler for Lab link click
-  function handleLabClick(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
-    e.preventDefault();
-    navigate('/lab');
-  }
-
   return (
-    <div className="main-layout fit-one-page">
-      {/* White-to-black transition overlay */}
-      {/* Top nav for mobile/tablet/small screens */}
-      {isMobile && (
-        <header className="top-nav mobile-dropdown-nav" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', zIndex: 1000, background: '#fff', boxShadow: '0 2px 16px rgba(0,0,0,0.07)' }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            width: '100%',
-            position: 'relative',
-            minHeight: 60
+    <header className="top-nav" style={{ 
+      position: 'fixed', 
+      top: 0, 
+      left: 0, 
+      width: '100vw', 
+      zIndex: 1000, 
+      background: '#fff', 
+      boxShadow: '0 2px 16px rgba(0,0,0,0.07)',
+      padding: '1rem 2rem'
+    }}>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        maxWidth: 1200,
+        margin: '0 auto',
+        width: '100%',
+        gap: '2rem'
+      }}>
+        <Link to="/" style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          textDecoration: 'none',
+          marginRight: 'auto'
+        }}>
+          <img src={logo} alt="ACTUM Logo" style={{ width: 40, height: 40, borderRadius: 8, marginRight: '1rem' }} />
+          <span style={{ 
+            fontWeight: 700,
+            fontSize: '1.2rem',
+            color: '#222',
+            fontFamily: 'Georgia, serif'
           }}>
-            <Link to="/" tabIndex={-1} style={{display: 'flex', alignItems: 'center', marginLeft: '0.6rem', marginRight: '0.6rem'}}>
-              <img src={logo} alt="ACTUM Logo" style={{width: 38, height: 38, borderRadius: 8, marginRight: '0.7rem'}} />
-            </Link>
-            <span style={{
-              position: 'absolute',
-              left: 0, right: 0,
-              textAlign: 'center',
-              fontWeight: 700,
-              fontSize: '1.1rem',
-              color: '#222',
-              fontFamily: 'Georgia, serif',
-              pointerEvents: 'none'
+            because it's fair
+          </span>
+        </Link>
+        {isMobile ? (
+          <button
+            className="dropdown-toggle"
+            aria-label="Toggle navigation menu"
+            onClick={() => setShowMobileMenu((s) => !s)}
+            style={{
+              padding: '0.5rem',
+              fontSize: '1rem',
+              background: 'none',
+              border: 'none'
             }}>
-              because it's fair
-            </span>
-            <button
-              className="dropdown-toggle"
-              aria-label="Toggle navigation menu"
-              onClick={() => setShowDropdown((s) => !s)}
+            Menu &#9662;
+          </button>
+        ) : (
+          <ul className="nav-links">
+            {sidebarLinks.map((link) => (
+              <li key={link.label}>
+                <Link
+                  to={link.path}
+                  className={location.pathname === link.path ? 'active' : ''}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {isMobile && showMobileMenu && (
+        <div style={{
+          width: '100%',
+          background: '#fff',
+          borderTop: '1px solid #eee',
+          padding: '1rem 2rem'
+        }}>
+          {sidebarLinks.map((link) => (
+            <Link
+              key={link.label}
+              to={link.path}
               style={{
-                padding: '1rem',
-                fontSize: '1.1rem',
-                background: 'none',
-                border: 'none',
-                textAlign: 'right',
-                marginLeft: 'auto'
-              }}>
-              Menu &#9662;
-            </button>
-          </div>
-          {showDropdown && (
-            <nav className="dropdown-menu" style={{width: '100%', background: '#fff', border: '1px solid #eee', borderTop: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.07)'}}>
-              {sidebarLinks.map((link) => (
-                link.href === '/lab' ? (
-                  <Link
-                    key={link.label}
-                    to={link.href}
-                    className={`dropdown-link${location.pathname === link.href ? ' active' : ''}`}
-                    style={{display: 'block', padding: '1rem 1.5rem', color: '#222', textDecoration: 'none', fontFamily: 'Georgia, serif', fontSize: '1.1rem'}}
-                    onClick={e => { handleLabClick(e); setShowDropdown(false); }}
-                  >
-                    {link.label}
-                  </Link>
-                ) : (
-                  <Link
-                    key={link.label}
-                    to={link.href}
-                    className={`dropdown-link${location.pathname === link.href ? ' active' : ''}`}
-                    style={{display: 'block', padding: '1rem 1.5rem', color: '#222', textDecoration: 'none', fontFamily: 'Georgia, serif', fontSize: '1.1rem'}}
-                    onClick={() => setShowDropdown(false)}
-                  >
-                    {link.label}
-                  </Link>
-                )
-              ))}
-            </nav>
-          )}
-        </header>
-      )}
-      {/* Sidebar for larger screens */}
-      {!isMobile && (
-        <div className="sidebar-container">
-          <aside className="sidebar always-visible">
-            <div className="logo-block">
-              <Link to="/" className="logo-link" tabIndex={-1} style={{display:'flex', flexDirection:'column', alignItems:'center', textDecoration:'none'}}>
-                <img src={logo} alt="ACTUM Logo" className="logo-img-official" />
-                {/* <div className="logo-title-official">ACTUM</div> */}
-              </Link>
-            </div>
-            <nav className="sidebar-nav">
-              {sidebarLinks.map((link) => {
-                const isActive = location.pathname === link.href;
-                return (
-                  <div key={link.label} className="sidebar-link-block">
-                    {link.href === '/lab' ? (
-                      <Link
-                        to={link.href}
-                        className={`sidebar-link main-link${isActive ? ' active' : ''}`}
-                        onClick={handleLabClick}
-                      >
-                        {link.label}
-                        {isActive && <div className="underline" />}
-                      </Link>
-                    ) : (
-                      <Link
-                        to={link.href}
-                        className={`sidebar-link main-link${isActive ? ' active' : ''}`}
-                      >
-                        {link.label}
-                        {isActive && <div className="underline" />}
-                      </Link>
-                    )}
-                  </div>
-                );
-              })}
-            </nav>
-            <div className="sidebar-socials bottom">
-{socialLinks.map(link => (
-  <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" title={link.label} className={`icon ${link.label.toLowerCase()}`}>
-    {link.icon}
-  </a>
-))}
-            </div>
-          </aside>
+                display: 'block',
+                padding: '0.5rem 0',
+                color: '#222',
+                textDecoration: 'none',
+                fontFamily: 'Georgia, serif',
+                fontSize: '1rem'
+              }}
+              onClick={() => setShowMobileMenu(false)}
+            >
+              {link.label}
+            </Link>
+          ))}
         </div>
       )}
-      <div className="content-area with-sidebar" style={{ marginTop: isMobile ? 60 : 0 }}>
-        {/* Mobile floating gear icon and menu */}
-        {isMobile && (
-          <>
-            <button
-              id="mobile-gear-icon"
-              className="floating-icon floating-gear"
-              style={{ left: 10, bottom: 10, zIndex: 2100, border: 'none', position: 'fixed', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 16 }}
-              aria-label="Open quick menu"
-              onClick={() => setShowMobileMenu((s) => !s)}
-            >
-              <GridIcon size={32} color="#222" />
-            </button>
-            {showMobileMenu && (
-              <div id="mobile-floating-menu" style={{ position: 'fixed', left: 10, bottom: 80, zIndex: 2200, padding: '1.1rem 1.2rem', display: 'flex', flexDirection: 'column', gap: '1.1rem', alignItems: 'center', borderRadius: 16 }}>
-                <Link to="/shop" className="floating-icon" title="Shop" style={{ position: 'static' }}>
-                  <img src={shopImg} alt="Shop" />
-                </Link>
-                <Link to="/donate" className="floating-icon" title="Donate" style={{ position: 'static' }}>
-                  <img src={donateImg} alt="Donate" />
-                </Link>
-                <a
-                  href="/laboratory"
-                  className="floating-icon"
-                  title="Visit the Lab"
-                  style={{ position: 'static', cursor: 'pointer' }}
-                  onClick={e => { handleLabClick(e); setShowMobileMenu(false); }}
-                >
-                  <img src={labImg} alt="Visit the Lab" />
-                </a>
-              </div>
-            )}
-          </>
-        )}
-        {/* Persistent floating icons for desktop only */}
-        {!isMobile && (
-          <>
-            <Link to="/shop" className="floating-icon floating-shop" title="Shop">
-              <img src={shopImg} alt="Shop" />
-            </Link>
-            <Link to="/donate" className="floating-icon floating-donate" title="Donate">
-              <img src={donateImg} alt="Donate" />
-            </Link>
-            <a
-              href="/laboratory"
-              className="floating-icon floating-lab"
-              title="Visit the Lab"
-              style={{ cursor: 'pointer' }}
-              onClick={handleLabClick}
-            >
-              <img src={labImg} alt="Visit the Lab" />
-            </a>
-          </>
-        )}
-        <AnimatedRoutes />
+    </header>
+  );
+}
+
+function QuickAccessIcons() {
+  return (
+    <div style={{
+      position: 'fixed',
+      right: '2rem',
+      bottom: '2rem',
+      display: 'flex',
+      gap: '1rem',
+      zIndex: 2100
+    }}>
+      <Link to="/shop" title="Shop" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <img src={shopImg} alt="Shop" style={{ width: 40, height: 40 }} />
+      </Link>
+      <Link to="/donate" title="Donate" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <img src={donateImg} alt="Donate" style={{ width: 40, height: 40 }} />
+      </Link>
+      <Link to="/lab" title="Visit the Lab" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <img src={labImg} alt="Visit the Lab" style={{ width: 40, height: 40 }} />
+      </Link>
+    </div>
+  );
+}
+
+function AppLayout() {
+  return (
+    <div className="main-layout">
+      <Navigation />
+      <div className="content-area">
+        <div className="page-content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/mission" element={<Mission />} />
+            <Route path="/team" element={<Team />} />
+            <Route path="/plan" element={<Plan />} />
+            <Route path="/progress" element={<Progress />} />
+            <Route path="/donate" element={<Donate />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/lab" element={<Lab />} />
+            <Route path="/shop" element={<Shop />} />
+            <Route path="/applications" element={<Applications />} />
+          </Routes>
+        </div>
       </div>
+      <QuickAccessIcons />
     </div>
   );
 }
@@ -321,20 +221,3 @@ function App() {
 }
 
 export default App;
-
-// Add GridIcon component
-const GridIcon = ({ size = 32, color = '#222' }) => (
-  <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-    {[0, 1, 2].map(row =>
-      [0, 1, 2].map(col => (
-        <circle
-          key={`${row}-${col}`}
-          cx={5 + col * 12}
-          cy={5 + row * 12}
-          r={3.5}
-          fill={color}
-        />
-      ))
-    )}
-  </svg>
-);

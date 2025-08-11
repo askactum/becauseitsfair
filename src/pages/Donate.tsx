@@ -67,7 +67,7 @@ const Donate: React.FC = () => {
   // No cleanup needed for single balloon
 
   return (
-    <div className="donate-outer donate-center">
+    <div className="donate-outer donate-center" style={{ width: '100%', maxWidth: 1200, margin: '0 auto' }}>
       {/* Heart balloon */}
       {heartBalloon.visible && (
         <div 
@@ -80,10 +80,10 @@ const Donate: React.FC = () => {
           ❤️
         </div>
       )}
-      <div style={{ width: '100%' }}>
-        <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 400, fontSize: '4rem', margin: `${headingMarginTop} 0 2.5rem 0`, textAlign: 'center', zIndex: 1 }}>give.</h1>
+      <div style={{ width: '100%', marginTop: '4rem' }}>
+        <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 400, fontSize: '4rem', margin: '0 0 3rem 0', textAlign: 'center', zIndex: 1 }}>give.</h1>
       </div>
-      <div style={{marginTop: 100, flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', gap: '3rem' }}>
         <div className="donation-box" style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center', gap: '3.5rem', background: 'none', boxShadow: 'none', padding: 0, borderRadius: 0, marginBottom: 0, zIndex: 1 }}>
           {BUTTONS.filter(btn => !btn.isCustom).map((btn) => (
             <a
@@ -175,7 +175,7 @@ const Donate: React.FC = () => {
           ))}
         </div>
       </div>
-      <div style={{ marginTop: '1rem', marginBottom: '2rem', fontStyle: 'italic', fontSize: '1.18rem', color: '#222', fontFamily: 'Georgia, serif', textAlign: 'center', maxWidth: 600, zIndex: 0 }}>
+      <div style={{ margin: '3rem 0', fontStyle: 'italic', fontSize: '1.18rem', color: '#222', fontFamily: 'Georgia, serif', textAlign: 'center', maxWidth: 600, zIndex: 0 }}>
         We are a non-profit organization pending 501(c)(3) status.<br />
         100% of proceeds support the mission to fund our housing development operations.
       </div>

@@ -5,7 +5,7 @@
     justify-content: center;
     align-items: center;
     gap: 20px;
-    padding: 20px;
+    padding: 5rem 20px 20px;
     margin: 0 auto;
     max-width: 1200px;
     min-height: 60vh;
@@ -63,18 +63,18 @@
     font-weight: normal;
 }
 
-.donate-button.size-1 { width: 200px; }
-.donate-button.size-2 { width: 250px; }
-.donate-button.size-3 { width: 300px; }
-.donate-button.size-4 { width: 375px; }
-.donate-button.size-custom { width: 355px; }
+.donate-button.size-1 { width: 150px; }
+.donate-button.size-2 { width: 180px; }
+.donate-button.size-3 { width: 210px; }
+.donate-button.size-4 { width: 260px; }
+.donate-button.size-custom { width: 240px; }
 
-.donate-button.size-1 .amount { font-size: 3em; font-family: Arial, sans-serif; }
-.donate-button.size-2 .amount { font-size: 3.3em; font-family: Arial, sans-serif; }
-.donate-button.size-3 .amount { font-size: 3.6em; font-family: Arial, sans-serif; }
-.donate-button.size-4 .amount { font-size: 3.9em; font-family: Arial, sans-serif; }
+.donate-button.size-1 .amount { font-size: 2.5em; font-family: Arial, sans-serif; }
+.donate-button.size-2 .amount { font-size: 2.7em; font-family: Arial, sans-serif; }
+.donate-button.size-3 .amount { font-size: 2.9em; font-family: Arial, sans-serif; }
+.donate-button.size-4 .amount { font-size: 2.9em; font-family: Arial, sans-serif; }
 .donate-button.size-custom .amount { 
-  font-size: 2.3em; 
+  font-size: 1.3em; 
   font-family: Arial, sans-serif; 
 }
 

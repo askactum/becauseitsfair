@@ -8,43 +8,47 @@
   transition: opacity 0.22s cubic-bezier(0.4,0,0.2,1);
 }.fade-enter,
 .fade-appear {
-  transform: scale(0.95);
+  transform: translateY(20px) scale(0.98);
   opacity: 0;
   z-index: 1;
   position: absolute;
   width: 100%;
-  top: 0;
+  top: 80px; /* Account for fixed nav */
   left: 0;
+  padding-top: 1rem;
 }
 .fade-enter-active,
 .fade-appear-active {
-  transform: scale(1);
+  transform: translateY(0) scale(1);
   opacity: 1;
-  transition: transform 400ms ease, opacity 400ms ease;
+  transition: transform 300ms ease, opacity 300ms ease;
   z-index: 2;
   position: absolute;
   width: 100%;
-  top: 0;
+  top: 80px; /* Account for fixed nav */
   left: 0;
+  padding-top: 1rem;
 }
 .fade-exit {
-  transform: scale(1);
+  transform: translateY(0) scale(1);
   opacity: 1;
   z-index: 2;
   position: absolute;
   width: 100%;
-  top: 0;
+  top: 80px; /* Account for fixed nav */
   left: 0;
+  padding-top: 1rem;
 }
 .fade-exit-active {
-  transform: scale(0.95);
+  transform: translateY(-20px) scale(0.98);
   opacity: 0;
-  transition: transform 400ms ease, opacity 400ms ease;
+  transition: transform 300ms ease, opacity 300ms ease;
   z-index: 2;
   position: absolute;
   width: 100%;
-  top: 0;
+  top: 80px; /* Account for fixed nav */
   left: 0;
+  padding-top: 1rem;
 }
 .fade-enter-done {
   opacity: 1;

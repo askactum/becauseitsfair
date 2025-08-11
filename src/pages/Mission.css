@@ -1,7 +1,7 @@
 .mission-objections {
   max-width: 800px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 5rem 2rem 2rem;
   font-size: 1.35rem;
 }
 
@@ -33,4 +33,4 @@
   display: block;
   margin-bottom: 0.5rem;
   font-size: 1.35rem;
-} 
+}

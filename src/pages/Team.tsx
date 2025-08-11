@@ -58,34 +58,77 @@ export default function Team() {
         At Actum, our team is fully volunteer-based. None of our leaders take a penny or salary for their work. Everyone on our team has their own career outside of Actum, so you know they’re here because they genuinely care about the mission. Doing good doesn’t need to come with a return—true change is its own reward. Unlike nonprofits where CEOs/staff earn salaries that tally into the hundreds of millions, the people below dedicate their time and skills because they know that a better world is worth building.
       </div>
       <h2 className="team-section-title" style={{ color: '#000', fontSize: '2.5rem', fontFamily: 'Georgia, serif', fontWeight: 400, textAlign: 'center' }}>Our Team</h2>
-      <div className="team-members-row">
+      <div className="team-members-row" style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+        gap: '2rem',
+        padding: '2rem',
+        maxWidth: '1200px',
+        margin: '0 auto'
+      }}>
         {teamMembers.map((member) => (
           <div
             className="team-member-card"
             key={member.name}
             onClick={() => openModal(member)}
-            style={{ cursor: 'pointer' }}
+            style={{ 
+              cursor: 'pointer',
+              background: '#fff',
+              borderRadius: '8px',
+              boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+              overflow: 'hidden',
+              transition: 'transform 0.2s ease',
+              transform: 'translateY(0)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-5px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
             tabIndex={0}
             role="button"
             aria-label={`Show full bio for ${member.name}`}
             onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') openModal(member); }}
           >
             <div
-  className={`team-member-photo ${member.name.toLowerCase().split(' ')[0]}`}
-  style={{ backgroundImage: `url('${member.photo}')` }}
-/>
-            <div className="team-member-info">
+              className={`team-member-photo ${member.name.toLowerCase().split(' ')[0]}`}
+              style={{ 
+                backgroundImage: `url('${member.photo}')`,
+                height: '300px',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }}
+            />
+            <div className="team-member-info" style={{
+              padding: '1.5rem'
+            }}>
               {(() => {
                 const { name, title } = splitNameAndTitle(member.name);
                 return (
                   <>
-                    <div className="team-member-name">{name}</div>
-                    {title && <div className="team-member-title-job"><b>{title}</b></div>}
+                    <div style={{ 
+                      fontSize: '1.5rem',
+                      fontWeight: '600',
+                      marginBottom: '0.5rem'
+                    }}>{name}</div>
+                    {title && <div style={{
+                      color: '#666',
+                      marginBottom: '1rem'
+                    }}><b>{title}</b></div>}
                   </>
                 );
               })()}
-              <div className="team-member-bio team-member-bio-truncate">
-                {member.bio.split(/(?<=[.!?])\s+/).slice(0, 10).join(' ')}
+              <div style={{
+                lineHeight: '1.6',
+                color: '#444',
+                display: '-webkit-box',
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}>
+                {member.bio}
               </div>
             </div>
           </div>

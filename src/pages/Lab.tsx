@@ -1,10 +1,8 @@
-import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import labLogo from '../assets/lab_w.png';
 import './Lab.css';
 
 export default function Lab() {
-  const navigate = useNavigate();
   const logoContainerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [isHovering, setIsHovering] = useState(false);
@@ -103,7 +101,10 @@ export default function Lab() {
       } else {
         // After typing is done, wait 2 seconds, then navigate
         setTimeout(() => {
-          navigate('/laboratory');
+          const labSection = document.getElementById('lab-section');
+          if (labSection) {
+            labSection.scrollIntoView({ behavior: 'smooth' });
+          }
         }, 2000);
       }
     };

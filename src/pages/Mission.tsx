@@ -2,7 +2,10 @@
 
 export default function Mission() {
   return (
-    <div className="main-content">
+    <div className="main-content" style={{
+      padding: '2rem 0',
+      boxSizing: 'border-box'
+    }}>
       <h1 className="mission-title">About Us</h1>
       <p className="mission-description">
         The mission of Actum is to create <strong>free, universal housing for all.</strong> We believe that having a secure home is a right. Unlike corporations and governments that commodify housing and profit from human need, we stand firm in our conviction that shelter should never be treated as a transaction, but as an inalienable right for all. While the challenge is great, there simply is no other option but to recognize a home as a birthright. This is about building housing <strong>not at a low cost, but at no cost—and</strong> leading the way to ensure that every person can live to their fullest, and experience the dignity they have always deserved.

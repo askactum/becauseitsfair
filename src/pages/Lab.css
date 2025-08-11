@@ -6,7 +6,7 @@
     min-height: 80vh;
     width: 100%;
     background: #fff;
-    padding: 2rem;
+    padding: 5rem 2rem 2rem;
 }
 
 .lab-logo {
@@ -17,7 +17,7 @@
 }
 
 .lab-title {
-    color: #1a2342;
+    color: #000000;
     font-size: 3rem;
     font-weight: 700;
     margin-bottom: 1.5rem;
@@ -28,7 +28,7 @@
 
 
 .lab-description {
-    color: #555;
+    color: #000000;
     font-size: 1.4rem;
     line-height: 1.7;
     margin-bottom: 3rem;
