@@ -1,0 +1,79 @@
+/* Social Icons Styling */
+.social-icons {
+  display: flex;
+  justify-content: center;
+  margin: 2.5rem auto 0 auto;
+  padding: 0;
+}
+
+.social-icons li {
+  list-style: none;
+}
+
+.social-icons li a {
+  width: 60px;
+  height: 60px;
+  background-color: #fff;
+  text-align: center;
+  line-height: 60px;
+  font-size: 28px;
+  margin: 0 10px;
+  display: block;
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+  border: 3px solid #fff;
+  z-index: 1;
+}
+
+.social-icons li a .icon {
+  position: relative;
+  color: #262626;
+  transition: .5s;
+  z-index: 3;
+}
+
+.social-icons li a:hover .icon {
+  color: #fff;
+  transform: rotateY(360deg);
+}
+
+.social-icons li a:before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #f00;
+  transition: .5s;
+  z-index: 2;
+}
+
+.social-icons li a:hover:before {
+  top: 0;
+}
+
+.social-icons li:nth-child(1) a:before {
+  background: #FF0000; /* YouTube red */
+}
+
+.social-icons li:nth-child(2) a:before {
+  background: #E4405F; /* Instagram pink */
+}
+
+.social-icons li:nth-child(3) a:before {
+  background: #1877F2; /* Facebook blue */
+}
+
+.social-icons li:nth-child(4) a:before {
+  background: #00f2ea; /* TikTok black */
+}
+
+.social-icons li:nth-child(5) a:before {
+  background: #000000; /* X/Twitter black */
+}
+
+.social-icons li:nth-child(6) a:before {
+  background: #9146FF; /* Twitch purple */
+}

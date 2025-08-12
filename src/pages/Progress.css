@@ -60,6 +60,25 @@
   justify-content: center;
 }
 
+/* Scroll animation styles */
+.progress-stat-block,
+.progress-date {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.progress-stat-block.animate,
+.progress-date.animate {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger animations */
+.progress-stat-block:nth-child(1) { transition-delay: 0.1s; }
+.progress-stat-block:nth-child(2) { transition-delay: 0.2s; }
+.progress-date { transition-delay: 0.3s; }
+
 @media (max-width: 700px) {
   .progress-container {
     height: calc(100dvh - 100px);
@@ -121,4 +140,4 @@
     margin: 0;
     overflow: hidden;
   }
-} 
+}

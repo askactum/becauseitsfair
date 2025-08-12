@@ -8,6 +8,16 @@ html, body {
   color: #111;
   box-sizing: border-box;
 }
+
+/* --- COPYRIGHT FOOTER --- */
+.copyright-footer {
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.8rem;
+  color: #888;
+  background: #fff;
+  border-top: 1px solid #eee;
+}
 *, *:before, *:after {
   box-sizing: inherit;
 }

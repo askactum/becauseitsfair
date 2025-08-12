@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import './Team.css';
 
 type TeamMember = {
   name: string;
@@ -38,6 +39,36 @@ function splitNameAndTitle(full: string): { name: string; title: string } {
 export default function Team() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<TeamMember | null>(null);
+  const introRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const memberRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate');
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    });
+
+    if (introRef.current) observer.observe(introRef.current);
+    if (titleRef.current) observer.observe(titleRef.current);
+    memberRefs.current.forEach(member => {
+      if (member) observer.observe(member);
+    });
+
+    return () => {
+      if (introRef.current) observer.unobserve(introRef.current);
+      if (titleRef.current) observer.unobserve(titleRef.current);
+      memberRefs.current.forEach(member => {
+        if (member) observer.unobserve(member);
+      });
+    };
+  }, []);
 
   const openModal = (member: TeamMember) => {
     setModalContent(member);
@@ -47,7 +78,7 @@ export default function Team() {
 
   return (
     <div className="page-content team-page">
-      <div className="team-intro-text" style={{
+      <div ref={introRef} className="team-intro-text" style={{
         maxWidth: '700px',
         margin: '2.5rem auto',
         textAlign: 'justify',
@@ -57,10 +88,11 @@ export default function Team() {
       }}>
         At Actum, our team is fully volunteer-based. None of our leaders take a penny or salary for their work. Everyone on our team has their own career outside of Actum, so you know they’re here because they genuinely care about the mission. Doing good doesn’t need to come with a return—true change is its own reward. Unlike nonprofits where CEOs/staff earn salaries that tally into the hundreds of millions, the people below dedicate their time and skills because they know that a better world is worth building.
       </div>
-      <h2 className="team-section-title" style={{ color: '#000', fontSize: '2.5rem', fontFamily: 'Georgia, serif', fontWeight: 400, textAlign: 'center' }}>Our Team</h2>
+      <h2 ref={titleRef} className="team-section-title" style={{ color: '#000', fontSize: '2.5rem', fontFamily: 'Georgia, serif', fontWeight: 400, textAlign: 'center' }}>Our Team</h2>
       <div className="team-members-row">
-        {teamMembers.map((member) => (
+        {teamMembers.map((member, index) => (
           <div
+            ref={el => { if (el) memberRefs.current[index] = el; }}
             className="team-member-card"
             key={member.name}
             onClick={() => openModal(member)}

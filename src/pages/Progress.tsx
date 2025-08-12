@@ -41,6 +41,33 @@ export default function Progress() {
   const [displayAmount, setDisplayAmount] = useState<number>(0);
   const [lastTransactionDate, setLastTransactionDate] = useState<string | null>(null);
   const animationRef = useRef<number | null>(null);
+  const statBlockRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const dateRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate');
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    });
+
+    statBlockRefs.current.forEach(item => {
+      if (item) observer.observe(item);
+    });
+    if (dateRef.current) observer.observe(dateRef.current);
+
+    return () => {
+      statBlockRefs.current.forEach(item => {
+        if (item) observer.unobserve(item);
+      });
+      if (dateRef.current) observer.unobserve(dateRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -120,23 +147,23 @@ export default function Progress() {
 
   return (
     <div className="progress-container progress-center">
-      <div className="progress-stat-block">
+      <div ref={el => { if (el) statBlockRefs.current[0] = el }} className="progress-stat-block">
         <img src={amountImg} alt="Amount Raised" />
         <div className="progress-stat-text">
           <div className="progress-stat-title">total amount raised</div>
-          <div className="progress-stat-value">
+          <div className="progress-stat-value"> 
             {amount !== null ? `$${displayAmount.toLocaleString()}` : '0'}
           </div>
         </div>
       </div>
-      <div className="progress-stat-block">
+      <div ref={el => { if (el) statBlockRefs.current[1] = el }} className="progress-stat-block">
         <img src={homeImg} alt="Homes Built" />
         <div className="progress-stat-text">
           <div className="progress-stat-title">total homes built</div>
           <div className="progress-stat-value">{homesBuilt}</div>
         </div>
       </div>
-      <div className="progress-date">
+      <div ref={dateRef} className="progress-date">
         as of: {formatDisplayDate(lastTransactionDate)}.
       </div>
     </div>

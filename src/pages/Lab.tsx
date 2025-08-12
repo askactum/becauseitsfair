@@ -164,24 +164,26 @@ export default function Lab() {
         </div>
       ) : (
         <>
-          <img
-            src={labLogo}
-            alt="Actum Lab Logo"
-            className="lab-logo"
-          />
-          <p className="lab-description">
-            A live global idea forum where volunteers shape the future of shelter. Contributors gather here to reimagine what's possible, debate strategies, ask questions, and propose new systems. From ethics to technology, the Lab is where Actum's mission evolves— together, with you.
-          </p>
-          <button
-            ref={buttonRef}
-            className="lab-button"
-            onClick={handleEnterLab}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            onMouseMove={handleMouseMove}
-          >
-            Enter The LAB
-          </button>
+          <div className="lab-content">
+            <img
+              src={labLogo}
+              alt="Actum Lab Logo"
+              className="lab-logo"
+            />
+            <p className="lab-description">
+              A live global idea forum where volunteers shape the future of shelter. Contributors gather here to reimagine what's possible, debate strategies, ask questions, and propose new systems. From ethics to technology, the Lab is where Actum's mission evolves— together, with you.
+            </p>
+            <button
+              ref={buttonRef}
+              className="lab-button"
+              onClick={handleEnterLab}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+              onMouseMove={handleMouseMove}
+            >
+              Enter The LAB
+            </button>
+          </div>
         </>
       )}
     </div>

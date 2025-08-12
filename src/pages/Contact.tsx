@@ -1,4 +1,6 @@
-import { FaYoutube, FaInstagram, FaFacebook, FaTiktok, FaXTwitter, FaTwitch } from 'react-icons/fa6';
+import './Contact.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faXTwitter, faTiktok, faTwitch, faFacebookF, faInstagram, faYoutube } from '@fortawesome/free-brands-svg-icons';
 
 export default function Contact() {
   return (
@@ -11,7 +13,7 @@ export default function Contact() {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      justifyContent: 'flex-start', // changed from center
+      justifyContent: 'center',
       minHeight: '100vh', // ensure full viewport height
       paddingTop: '4.5rem', // add space from the top
     }}>
@@ -42,24 +44,40 @@ export default function Contact() {
           <span style={{ fontStyle: 'italic' }}>5805 White Oak Ave #16474<br />Encino, CA 91416<br />United States</span>
         </div>
       </div>
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 38px)',
-        gridTemplateRows: 'repeat(2, 1fr)',
-        columnGap: '2.05rem',
-        rowGap: '0.30rem',
-        width: 'auto',
-        margin: '2.5rem auto 0 auto',
-        justifyItems: 'center',
-        alignItems: 'center',
-      }}>
-        <a href="https://www.youtube.com/@becauseitsfair" target="_blank" rel="noopener noreferrer" title="YouTube" className="contact-social-icon youtube"><FaYoutube /></a>
-        <a href="https://www.instagram.com/becauseitsfair/" target="_blank" rel="noopener noreferrer" title="Instagram" className="contact-social-icon instagram"><FaInstagram /></a>
-        <a href="https://www.facebook.com/becauseitsfair/" target="_blank" rel="noopener noreferrer" title="Facebook" className="contact-social-icon facebook"><FaFacebook /></a>
-        <a href="https://www.tiktok.com/@becauseitsfair" target="_blank" rel="noopener noreferrer" title="TikTok" className="contact-social-icon tiktok"><FaTiktok /></a>
-        <a href="https://x.com/becauseitsfair" target="_blank" rel="noopener noreferrer" title="X" className="contact-social-icon x"><FaXTwitter /></a>
-        <a href="https://www.twitch.tv/universalhousing" target="_blank" rel="noopener noreferrer" title="Twitch" className="contact-social-icon twitch"><FaTwitch /></a>
-      </div>
+      <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossOrigin="anonymous" />
+
+      <ul className="social-icons">
+        <li>
+          <a href="https://www.youtube.com/becauseitsfair/" target="_blank" rel="noopener noreferrer">
+            <FontAwesomeIcon icon={faYoutube} className="icon" />
+          </a>
+        </li>
+        <li>
+          <a href="https://www.instagram.com/becauseitsfair/" target="_blank" rel="noopener noreferrer">
+            <FontAwesomeIcon icon={faInstagram} className="icon" />
+          </a>
+        </li>
+        <li>
+          <a href="https://www.facebook.com/becauseitsfair/" target="_blank" rel="noopener noreferrer">
+            <FontAwesomeIcon icon={faFacebookF} className="icon" />
+          </a>
+        </li>
+        <li>
+          <a href="https://www.tiktok.com/company/becauseitsfair" target="_blank" rel="noopener noreferrer">
+            <FontAwesomeIcon icon={faTiktok} className="icon" />
+          </a>
+        </li>
+        <li>
+          <a href="https://x.com/becauseitsfair" target="_blank" rel="noopener noreferrer">
+            <FontAwesomeIcon icon={faXTwitter} className="icon" />
+          </a>
+        </li>
+        <li>
+          <a href="https://www.twitch.tv/becauseitsfair" target="_blank" rel="noopener noreferrer">
+            <FontAwesomeIcon icon={faTwitch} className="icon" />
+          </a>
+        </li>
+      </ul>
     </div>
   );
 }

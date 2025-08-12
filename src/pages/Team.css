@@ -1,0 +1,21 @@
+/* Scroll animation styles */
+.team-intro-text,
+.team-section-title,
+.team-member-card {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.team-intro-text.animate,
+.team-section-title.animate,
+.team-member-card.animate {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger animations for team members */
+.team-members-row .team-member-card:nth-child(1) { transition-delay: 0.1s; }
+.team-members-row .team-member-card:nth-child(2) { transition-delay: 0.2s; }
+.team-members-row .team-member-card:nth-child(3) { transition-delay: 0.3s; }
+.team-members-row .team-member-card:nth-child(4) { transition-delay: 0.4s; }

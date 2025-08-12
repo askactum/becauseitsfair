@@ -85,56 +85,69 @@ const Donate: React.FC = () => {
       </div>
       <div style={{marginTop: 100, flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
         <div className="donation-box" style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center', gap: '3.5rem', background: 'none', boxShadow: 'none', padding: 0, borderRadius: 0, marginBottom: 0, zIndex: 1 }}>
-          {BUTTONS.filter(btn => !btn.isCustom).map((btn) => (
-            <a
-              key={btn.id}
-              href={`#donate-${btn.amount}`}
-              className={`donate-button ${btn.sizeClass}`}
-              onMouseEnter={(e) => {
-                // Show heart balloon
-                const rect = e.currentTarget.getBoundingClientRect();
-                setHeartBalloon({
-                  x: rect.left + rect.width/2 - 41,
-                  y: rect.top - 70,
-                  visible: true
-                });
-              }}
-              onMouseLeave={() => {
-                // Hide heart balloon
-                setHeartBalloon(prev => ({...prev, visible: false}));
-              }}
-              onClick={(e) => {
-                e.preventDefault();
-                // Create PayPal popup window
-                const popup = window.open('', 'paypal_popup', 'width=600,height=700,scrollbars=yes,resizable=yes');
-                
-                if (popup) {
-                  // Create form content for popup
-                  const formHtml = `
-                    <html>
-                      <head><title>PayPal Donation</title></head>
-                      <body>
-                        <form method="POST" action="https://www.paypal.com/cgi-bin/webscr">
-                          <input type="hidden" name="cmd" value="_s-xclick">
-                          <input type="hidden" name="hosted_button_id" value="${btn.hosted_button_id}">
-                        </form>
-                        <script>document.forms[0].submit();</script>
-                      </body>
-                    </html>
-                  `;
-                  
-                  popup.document.write(formHtml);
-                  popup.document.close();
-                }
-              }}
-            >
-              <img src="/assets/actum.svg" className="actum-logo" alt="Actum" />
-              <div className="amount">
-                {!btn.isCustom && <span className="dollar-sign">$</span>}
-                {btn.amount}
+          {BUTTONS.filter(btn => !btn.isCustom).map((btn) => {
+            let description = '';
+            switch(btn.amount) {
+              case 5: description = 'Add Your Brick'; break;
+              case 20: description = 'Lay the Foundation'; break;
+              case 50: description = 'Raise the Walls'; break;
+              case 100: description = 'Build the Future'; break;
+              default: description = '';
+            }
+            
+            return (
+              <div key={btn.id} style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                <a
+                  href={`#donate-${btn.amount}`}
+                  className={`donate-button ${btn.sizeClass}`}
+                  onMouseEnter={(e) => {
+                    // Show heart balloon
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    setHeartBalloon({
+                      x: rect.left + rect.width/2 - 41,
+                      y: rect.top - 70,
+                      visible: true
+                    });
+                  }}
+                  onMouseLeave={() => {
+                    // Hide heart balloon
+                    setHeartBalloon(prev => ({...prev, visible: false}));
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    // Create PayPal popup window
+                    const popup = window.open('', 'paypal_popup', 'width=600,height=700,scrollbars=yes,resizable=yes');
+                    
+                    if (popup) {
+                      // Create form content for popup
+                      const formHtml = `
+                        <html>
+                          <head><title>PayPal Donation</title></head>
+                          <body>
+                            <form method="POST" action="https://www.paypal.com/cgi-bin/webscr">
+                              <input type="hidden" name="cmd" value="_s-xclick">
+                              <input type="hidden" name="hosted_button_id" value="${btn.hosted_button_id}">
+                            </form>
+                            <script>document.forms[0].submit();</script>
+                          </body>
+                        </html>
+                      `;
+                      
+                      popup.document.write(formHtml);
+                      popup.document.close();
+                    }
+                  }}
+                >
+                  <img src="/assets/actum.svg" className="actum-logo" alt="Actum" />
+                  <div className="amount">
+                    {!btn.isCustom && <span className="dollar-sign">$</span>}
+                    {btn.amount}
+                  </div>
+                </a>
+                <div className="donation-description">{description}</div>
               </div>
-            </a>
-          ))}
+            );
+          })}
         </div>
         <div className="custom-button-row" style={{ display: 'flex', justifyContent: 'center', gap: '3.5rem' }}>
           {BUTTONS.filter(btn => btn.isCustom).map((btn) => (

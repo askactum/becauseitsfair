@@ -307,6 +307,9 @@ function AppLayout() {
           </>
         )}
         <AnimatedRoutes />
+        <div className="copyright-footer">
+          © {new Date().getFullYear()} ACTUM. All rights reserved.
+        </div>
       </div>
     </div>
   );

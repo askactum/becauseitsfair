@@ -34,3 +34,68 @@
   margin-bottom: 0.5rem;
   font-size: 1.35rem;
 } 
+
+/* General styling for the component
+.main-content {
+  font-family: sans-serif;
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  color: #333;
+}
+
+.mission-title, .mission-section-title {
+  font-size: 2.5rem;
+  color: #000;
+  margin-bottom: 1rem;
+}
+
+.mission-description, .mission-objections p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.mission-latin {
+  margin: 2rem 0;
+  font-style: italic;
+  color: #555;
+}
+
+.latin-meaning {
+  font-weight: bold;
+} */
+
+/*
+ * ----------------------------------------
+ * Animation Keyframes
+ * ----------------------------------------
+ */
+
+/* Animation for elements to fade in and slide up */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation for a subtle background highlight effect */
+
+/*
+ * ----------------------------------------
+ * Animation Classes
+ * ----------------------------------------
+ */
+
+/* Base class for the fade-in-up animation */
+.anim-fade-in-up {
+  /* Set initial state to transparent for animation */
+  opacity: 0;
+  /* Apply the animation */
+  animation: fadeInUp 0.4s ease-out forwards;
+}
